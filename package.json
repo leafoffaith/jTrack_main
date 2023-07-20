@@ -1,0 +1,41 @@
+{
+  "name": "jtrack",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev:frontend": "vite",
+    "dev:server": "ts-node src/server/server.cjs",
+    "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:server\"",
+    "build": "tsc && vite build",
+    "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@types/express": "^4.17.17",
+    "@types/pg": "^8.10.2",
+    "axios": "^1.4.0",
+    "dayjs": "^1.11.9",
+    "express": "^4.18.2",
+    "pg": "^8.11.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.14.2",
+    "reflect-metadata": "^0.1.13",
+    "supermemo": "^2.0.17",
+    "typeorm": "^0.3.17"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.14",
+    "@types/react-dom": "^18.2.6",
+    "@typescript-eslint/eslint-plugin": "^5.61.0",
+    "@typescript-eslint/parser": "^5.61.0",
+    "@vitejs/plugin-react": "^4.0.1",
+    "concurrently": "^8.2.0",
+    "eslint": "^8.44.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.1",
+    "typescript": "^5.0.2",
+    "vite": "^4.4.0"
+  }
+}
