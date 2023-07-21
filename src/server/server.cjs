@@ -13,13 +13,13 @@ const pool = new Pool({
   host: 'localhost',
   port: 5432,
   database: 'masterdecks',
+  table: 'decks'
 });
 
 pool.connect((err, client, done) => {
   if (err) throw err;
   console.log('Connected to the PostgreSQL database');
   // Call done() to release the client back to the pool
-  done();
 });
 
 
@@ -36,8 +36,9 @@ app.get('/', (req, res) => {
 });
 
 app.get('/api/decks', (req, res) => {
-    pool.query('SELECT * FROM decks', (err, result) => {
-        if (err) throw err;
+    pool.query('SELECT * FROM masterdecks.decks', (err, result) => {
+        if (err) return res.status(500).json({ msg: err });
+        
         res.send(result.rows);
     });
 });
