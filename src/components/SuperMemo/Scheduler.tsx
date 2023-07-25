@@ -3,11 +3,11 @@ import dayjs from 'dayjs';
 import { supermemo, SuperMemoGrade } from 'supermemo'
 import Flashcard from '../Flashcard/Flashcard';
 import { FlashcardItem } from '../Flashcard/FlashcardItem';
-
+import { useParams } from 'react-router-dom';
 //original flashcard component that has not yet been practiced
 
 //props will include the array of flashcards that will be passed to the scheduler in the form of 'Deck'
-//Deck will be a component that will be created in the future
+//props
 interface SchedulerProps {
   flashcards: FlashcardItem[];
 }
@@ -18,7 +18,9 @@ interface UpdatedFlashcard extends FlashcardItem {
 }
 
 //Start of Scheduler component
-const Scheduler: React.FC<SchedulerProps> = ({ flashcards }) => {
+const Scheduler: React.FC<SchedulerProps> = ({ flashcards }): JSX.Element => {
+
+  const {title} = useParams<{title: string}>()
 
   // create local array of flashcards that will be used in the scheduler
   // this will be the array that will be updated with the updated flashcards
@@ -92,7 +94,7 @@ const Scheduler: React.FC<SchedulerProps> = ({ flashcards }) => {
      
    return (
     <div>
-
+      <h1>Test</h1>
       {currentFlashcard && isDue ? (
         <div>
           <h3>Flashcard {currentCardIndex + 1}</h3>

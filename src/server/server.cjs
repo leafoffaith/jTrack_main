@@ -30,17 +30,31 @@ app.use(cors({
   origin: 'http://localhost:5173', // Replace with your frontend URL
 }));
 
-//Routes
+//Router
 app.get('/', (req, res) => {
     res.send('Hello World!');
 });
 
+//List of all decks available
 app.get('/api/decks', (req, res) => {
     pool.query('SELECT * FROM masterdecks.decks', (err, result) => {
         if (err) return res.status(500).json({ msg: err });
-        
         res.send(result.rows);
     });
+});
+
+
+//Get a specific deck
+app.get('/api/decks/:title', (req, res) => {
+  const deckTitle = req.params.title // Make sure this is defined correctly
+  pool.query('SELECT * FROM masterdecks.decks WHERE title = $1', [deckTitle], (err, result) => {
+      if (err) {
+          console.error('Error executing query:', err.message);
+          return res.status(500).json({ msg: 'Error executing query' });
+      }
+      console.log(result.rows);
+      res.send(result.rows);
+  });
 });
 
 

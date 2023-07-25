@@ -5,11 +5,13 @@
  */
 
 import React from 'react';
+import { Link } from 'react-router-dom';
 
-interface Deck {
+interface Deck {  
     deck_id: number;
     title: string;
 }
+
 
 //define props for DeckSelect
 interface DeckSelectProps {
@@ -24,7 +26,9 @@ const DeckSelect: React.FC<DeckSelectProps> = ({ deckList }): JSX.Element => {
         return (
           <div key={deck.deck_id}> {/* Added key prop with a unique identifier */}
             <h1>{deck.title}</h1>
-            <button>Start Learning!</button>
+            <Link to={`/learn/${deck.title}`}>
+              <button>Start Learning</button>
+            </Link>
           </div>
         );
       })}

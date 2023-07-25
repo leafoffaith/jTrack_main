@@ -1,0 +1,32 @@
+export const n5kanjiList = [
+'日',
+'週',
+'月',
+'火',
+'水',
+'木',
+'金',
+'土',
+'年',
+'今',
+'昨',
+'明',
+'朝',
+'昼',
+'夜',
+'時',
+'分',
+'半',
+'午',
+'前',
+'後',
+'午',
+'間',
+'何',
+'毎',
+'母',
+'父',
+]
+
+//for every kanji in the list, create a new kanji object and push it to a new kanji array
+

@@ -3,7 +3,9 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import './App.css'
 import Home from './components/Home/Home'
 import Learn from './components/Learn/Learn'
+import Kanji from './components/Kanji/Kanji'
 import { QueryClient, QueryClientProvider } from 'react-query'
+import Scheduler from './components/SuperMemo/Scheduler'
 
 function App() {
 
@@ -26,7 +28,8 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/learn" element={<Learn />} />        
+          <Route path="/learn" element={<Learn />} />  
+          <Route path="/learn/kanji" element={<Kanji/>} />
         </Routes>
       </QueryClientProvider>
     </BrowserRouter>
