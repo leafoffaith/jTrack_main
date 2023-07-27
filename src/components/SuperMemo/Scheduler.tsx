@@ -1,26 +1,48 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import { supermemo, SuperMemoGrade } from 'supermemo'
 import Flashcard from '../Flashcard/Flashcard';
 import { FlashcardItem } from '../Flashcard/FlashcardItem';
 import { useParams } from 'react-router-dom';
+import { fetchKanjiByLevel } from '../Kanji/N5KanjiList';
 //original flashcard component that has not yet been practiced
 
 //props will include the array of flashcards that will be passed to the scheduler in the form of 'Deck'
 //props
-interface SchedulerProps {
-  flashcards: FlashcardItem[];
-}
-
+// interface SchedulerProps {
+//   flashcards: FlashcardItem[];
+// }
+/**
+ * @TODO useParams instead of possing props so that I can directly fetch and render when the scheduler component is rendered
+ */
 //updated flashcard is a flashcard that has been practiced
 interface UpdatedFlashcard extends FlashcardItem {
   dueDate: string;
 }
-
 //Start of Scheduler component
-const Scheduler: React.FC<SchedulerProps> = ({ flashcards }): JSX.Element => {
+const Scheduler = (): JSX.Element => {
 
-  const {title} = useParams<{title: string}>()
+  const [kanjiData, setKanjiData] = useState<[]>([]);
+
+  // title state
+
+  const { title } = useParams<{ title: string }>();
+
+
+  useEffect(() => {
+    const fetchKanjiData = async () => {
+      try {
+        const data = await fetchKanjiByLevel(title);
+        console.log(data);
+        setKanjiData(data);
+      } catch (error) {
+        console.error('Error fetching kanji data:', error);
+      }
+    };
+
+    fetchKanjiData();
+  }, [title]);
+
 
   // create local array of flashcards that will be used in the scheduler
   // this will be the array that will be updated with the updated flashcards
@@ -34,17 +56,18 @@ const Scheduler: React.FC<SchedulerProps> = ({ flashcards }): JSX.Element => {
   //The type is set to be an updatedFlashcard to ensure that unpractice flashcards will never be added
   const practicedFlashcards: UpdatedFlashcard[] = [];
 
-  /* Pratice function logic that uses practiceFlashcard function
-  @PARAM grade - the grade of the flashcard that is being practiced
+  /** 
+   *  Pratice function logic that uses practiceFlashcard function
+   * @PARAM grade - the grade of the flashcard that is being practiced
   */
   const practice = (grade: SuperMemoGrade): void => {
-    const currentFlashcard = flashcards[currentCardIndex];
+    const currentFlashcard = kanjiData[currentCardIndex];
 
     // Update the flashcard with the grade using the practiceFlashcard function
     const updatedFlashcard = practiceFlashcard(currentFlashcard, grade);
     console.log(grade);
     // Update the flashcard in your array or database with the updatedFlashcard data
-    const updatedFlashcards = [...flashcards];
+    const updatedFlashcards = [...kanjiData];
     //replace the current flashcard with the updated flashcard
     updatedFlashcards[currentCardIndex] = updatedFlashcard;
 
@@ -55,7 +78,7 @@ const Scheduler: React.FC<SchedulerProps> = ({ flashcards }): JSX.Element => {
     console.log(updatedFlashcard)
     //Move to the next flashcard or loop back to the first flashcard if reached the end
     //This will keep allow the user to keep revising cards that are due
-    if (currentCardIndex === flashcards.length - 1) {
+    if (currentCardIndex === kanjiData.length - 1) {
       setCurrentCardIndex(0);
     }
     else {
@@ -77,7 +100,7 @@ const Scheduler: React.FC<SchedulerProps> = ({ flashcards }): JSX.Element => {
   };
 
   //removed | undefined from the currentFlashcard type so that undefined types are never pushed
-  const currentFlashcard: FlashcardItem = flashcards[currentCardIndex];
+  const currentFlashcard: FlashcardItem = kanjiData[currentCardIndex];
 
   const isFlashcardDue = (dueDate: string | undefined): boolean => {
     if (!dueDate) {
@@ -94,10 +117,9 @@ const Scheduler: React.FC<SchedulerProps> = ({ flashcards }): JSX.Element => {
      
    return (
     <div>
-      <h1>Test</h1>
       {currentFlashcard && isDue ? (
         <div>
-          <h3>Flashcard {currentCardIndex + 1}</h3>
+          {/* <h3>Flashcard {currentCardIndex + 1}</h3> */}
           <Flashcard front={currentFlashcard.front} back={currentFlashcard.back}/>
           <button onClick={() => practice(5)}>Easy</button>
           <button onClick={() => practice(3)}>Medium</button>
@@ -110,6 +132,18 @@ const Scheduler: React.FC<SchedulerProps> = ({ flashcards }): JSX.Element => {
       )}
     </div>
   );
+
+  // return (
+  //   <div>
+  //     <h2>Kanji Data</h2>
+  //     {kanjiData.map((kanji) => (
+  //       <div>
+  //         <h3>{kanji.front}</h3>
+  //         {/* Add more details about the kanji, e.g., reading, examples, etc., as needed */}
+  //       </div>
+  //     ))}
+  //   </div>
+  // )
 };
 
 export default Scheduler;

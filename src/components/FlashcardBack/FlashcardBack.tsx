@@ -13,7 +13,7 @@ interface FlashcardBackProps {
   const FlashcardBack: React.FC<FlashcardBackProps> = ({ back }) => {
       return (
         <div>
-          <h1>Flashcard Back</h1>
+          <p>Meaning: {back}</p>
           <p>Flashcard back content</p>
         </div>
       );

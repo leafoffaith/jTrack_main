@@ -30,6 +30,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/learn" element={<Learn />} />  
           <Route path="/learn/kanji" element={<Kanji/>} />
+          <Route path="/learn/kanji/:title" element={<Scheduler />} />
         </Routes>
       </QueryClientProvider>
     </BrowserRouter>

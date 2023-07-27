@@ -1,19 +1,20 @@
-// use kanjiapi.dev to fetch kanji for different grades
+import { FlashcardItem } from "../Flashcard/FlashcardItem";
+import dayjs from "dayjs";
 
-///GET /vi/kanji/
-
-//https://kanjiapi.dev/v1/kanji/all
-
-const useKanjiFetch = async ({ queryKey }) => {
-
-    const query = queryKey;
-    // Fetch data from API
-    const apiRes = await fetch(`https://kanjiapi.dev/v1/kanji${query}`);
-    
-    // If error, throw error
-    if (!apiRes.ok) throw new Error(apiRes.statusText);
-
-    return apiRes.json();
+interface datedFlashcard extends FlashcardItem {
+    dueDate: string;
 }
 
-export default useKanjiFetch;
+//dueDate can be received as dayjs().toISOString()
+
+export async function useKanjifetch(kanji: string) {
+    try{
+        const response = await fetch(`https://kanjiapi.dev/v1/kanji/${kanji}`)
+        const data = await response.json();
+        console.log(data);
+        return data;
+    }
+    catch(error){
+        console.log(error);
+    }
+}

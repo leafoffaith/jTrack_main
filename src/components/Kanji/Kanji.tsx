@@ -2,41 +2,34 @@ import Scheduler from "../SuperMemo/Scheduler";
 import { n5kanjiList } from "./N5KanjiList";
 import useKanjiFetch from "../Fetching/useKanjiFetch";
 import { useQueries, useQuery } from "react-query";
+import { Link } from "react-router-dom";
 
 const Kanji = (props: any) => {
 
-   
-    //create local array of fllashcardItem from 
-    const flashcards = n5kanjiList;
-    
-     //map over useKanjiFetch useQuery and create a flashcardItem for each kanji and push it to the flashcards array
-     useQueries(
-        flashcards.map((kanji) => {
-            return {
-                queryKey: ['kanji', kanji],
-                queryFn: () => useKanjiFetch(kanji),
-                enabled: true,
-            };
-        })
-    );
-    
-
-    /**
-     * Template of what a flashcardItem looks like
-     * const flashcard: Flashcard = {
-        front: 'What is the capital of France?',
-        back: 'Paris',
-        interval: 0,
-        repetition: 0,
-        efactor: 2.5,
-        dueDate: dayjs().toISOString(),
-      };*/
+   const kArray = ['N5', 'N4', 'N3'];
+        
+    //function to manage deck click
+    const DeckClick = (deck: string) => {
+        console.log(deck)
+    }
 
     return (
         <>
-            <Scheduler flashcards={n5Flashcards}/>
+         <div>
+            <h2>Please choose a deck!</h2>
+            {kArray.map((k) => {
+                return (
+                    <div key={k}>
+                        <h3>{k}</h3>
+                        <Link to={`/learn/kanji/${k}`}>
+                            <button onClick={() => DeckClick(k)}>Select</button>
+                        </Link>
+                    </div>
+                )
+            })}
+         </div>
         </>
     )
 }
 
-export default Kanji;
+export default Kanji
