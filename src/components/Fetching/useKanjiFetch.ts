@@ -11,7 +11,7 @@ export async function useKanjifetch(kanji: string) {
     try{
         const response = await fetch(`https://kanjiapi.dev/v1/kanji/${kanji}`)
         const data = await response.json();
-        console.log(data);
+        // console.log(data);
         return data;
     }
     catch(error){

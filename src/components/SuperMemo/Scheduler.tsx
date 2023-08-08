@@ -23,17 +23,20 @@ interface UpdatedFlashcard extends FlashcardItem {
 const Scheduler = (): JSX.Element => {
 
   const [kanjiData, setKanjiData] = useState<[]>([]);
+  
+  //practiced flashcards array
+  const [practicedFlashcards, setPracticedFlashcards] = useState<UpdatedFlashcard[]>([]);
 
   // title state
-
   const { title } = useParams<{ title: string }>();
 
 
+  //fetches kanji data
   useEffect(() => {
     const fetchKanjiData = async () => {
       try {
         const data = await fetchKanjiByLevel(title);
-        console.log(data);
+        // console.log(data);
         setKanjiData(data);
       } catch (error) {
         console.error('Error fetching kanji data:', error);
@@ -42,6 +45,8 @@ const Scheduler = (): JSX.Element => {
 
     fetchKanjiData();
   }, [title]);
+
+
 
 
   // create local array of flashcards that will be used in the scheduler
@@ -54,37 +59,35 @@ const Scheduler = (): JSX.Element => {
 
   //create empty array that will be used to store the updated flashcards
   //The type is set to be an updatedFlashcard to ensure that unpractice flashcards will never be added
-  const practicedFlashcards: UpdatedFlashcard[] = [];
+  // const practicedFlashcards: UpdatedFlashcard[] = [];
 
   /** 
    *  Pratice function logic that uses practiceFlashcard function
-   * @PARAM grade - the grade of the flashcard that is being practiced
+    @PARAM grade - the grade of the flashcard that is being practiced
   */
   const practice = (grade: SuperMemoGrade): void => {
     const currentFlashcard = kanjiData[currentCardIndex];
 
     // Update the flashcard with the grade using the practiceFlashcard function
     const updatedFlashcard = practiceFlashcard(currentFlashcard, grade);
-    console.log(grade);
+    console.log(updatedFlashcard);
     // Update the flashcard in your array or database with the updatedFlashcard data
     const updatedFlashcards = [...kanjiData];
     //replace the current flashcard with the updated flashcard
     updatedFlashcards[currentCardIndex] = updatedFlashcard;
 
-    // Update the flashcard in your state
-    // setFlashcardsCopy(updatedFlashcards);
-    //push to the practiceFlashcards array instead of setting the state
-    practicedFlashcards.push(updatedFlashcard);
-    console.log(updatedFlashcard)
-    //Move to the next flashcard or loop back to the first flashcard if reached the end
-    //This will keep allow the user to keep revising cards that are due
+    //set practiced flashcards
+    setPracticedFlashcards([...practicedFlashcards, updatedFlashcard]);
+
+    // console.log(practicedFlashcards);
+   
+    setCurrentCardIndex(currentCardIndex + 1);
+
+    //once all practiced move to practiced flashcards to see if there are any due
     if (currentCardIndex === kanjiData.length - 1) {
       setCurrentCardIndex(0);
+      setKanjiData(practicedFlashcards);
     }
-    else {
-      setCurrentCardIndex(currentCardIndex + 1);
-    }
-
   };
 
   const practiceFlashcard = (flashcard: FlashcardItem, grade: SuperMemoGrade): UpdatedFlashcard => {
@@ -108,13 +111,14 @@ const Scheduler = (): JSX.Element => {
     }
     const currentDate = dayjs();
     const flashcardDueDate = dayjs(dueDate);
-    console.log(flashcardDueDate.isBefore(currentDate) || flashcardDueDate.isSame(currentDate, 'day'))
-    return flashcardDueDate.isBefore(currentDate) || flashcardDueDate.isSame(currentDate, 'day');
+    console.log(flashcardDueDate.isSame(currentDate, 'day'))
+    return flashcardDueDate.isSame(currentDate, 'day');
   };
 
    // Check if the current flashcard is due
+  //  console.log(currentFlashcard)
    const isDue = currentFlashcard && isFlashcardDue(currentFlashcard.dueDate);
-     
+  
    return (
     <div>
       {currentFlashcard && isDue ? (
@@ -132,18 +136,6 @@ const Scheduler = (): JSX.Element => {
       )}
     </div>
   );
-
-  // return (
-  //   <div>
-  //     <h2>Kanji Data</h2>
-  //     {kanjiData.map((kanji) => (
-  //       <div>
-  //         <h3>{kanji.front}</h3>
-  //         {/* Add more details about the kanji, e.g., reading, examples, etc., as needed */}
-  //       </div>
-  //     ))}
-  //   </div>
-  // )
 };
 
 export default Scheduler;

@@ -1,15 +1,35 @@
-import { useState } from 'react'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import './App.css'
-import Home from './components/Home/Home'
-import Learn from './components/Learn/Learn'
-import Kanji from './components/Kanji/Kanji'
+import { useState, useEffect } from 'react'
+import { useNavigate, BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from 'react-query'
-import Scheduler from './components/SuperMemo/Scheduler'
+
+import './App.css'
+//to be replaced by Index 
+import Home from './components/Home/Home'
+import { AuthHandler } from './components/Home/AuthHandler'
+import Login from './components/Login/Login'
+import Profile from './components/Profile/Profile'
+import Leaderboard from './components/Leaderboard/Leaderboard'
+import { Kanji, Learn, Scheduler } from './components'
+import { supaClient } from './components/Client/supaClient'
+
 
 function App() {
 
+  const [session, setSession] = useState(null)
 
+  useEffect(() => {
+    supaClient.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    }).then(() => {
+      console.log(session);
+      }).catch((error) => {
+          console.log(error);
+      })
+
+    supaClient.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    })
+  }, [])
     //limit useEffect in React <= secret to good react code
     const queryClient = new QueryClient({
       defaultOptions: {
@@ -28,9 +48,12 @@ function App() {
       <QueryClientProvider client={queryClient}>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/learn" element={<Learn />} />  
-          <Route path="/learn/kanji" element={<Kanji/>} />
-          <Route path="/learn/kanji/:title" element={<Scheduler />} />
+          <Route path="/learn" element={session ? <Learn /> : <Login />} />
+          <Route path="/learn/kanji" element={session ? <Kanji /> : <Login />} />
+          <Route path="/learn/kanji/:title" element={session? <Scheduler /> : <Login />} />
+          <Route path="/login" element={session ? <Home /> : <Login />} />
+          <Route path="/profile" element={session ? <Profile session={session} /> : <Login />} />
+          <Route path="/leaderboard" element={session ? <Leaderboard /> : <Login />} />
         </Routes>
       </QueryClientProvider>
     </BrowserRouter>

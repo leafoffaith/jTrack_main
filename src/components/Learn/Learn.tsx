@@ -1,6 +1,7 @@
 import DeckSelect from "../DeckSelect/DeckSelect";
 import fetchDeckList from "../Fetching/fetchDeckList";
 import { useQuery } from "react-query";
+import Navbar from "../Navbar/Navbar";
 
 const Learn = () => {
     
@@ -20,6 +21,9 @@ const Learn = () => {
     console.log(decks)
     return (
         <div>
+            <div className="container" style={{ padding: '50px 0 100px 0' }}>
+              <Navbar />
+            </div>
             {/* Render DeckSelect with fetched 'decks' */}
             <DeckSelect deckList={decks}/>
         </div>

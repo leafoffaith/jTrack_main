@@ -33,4 +33,8 @@ export const menuItems = [
       title: 'Leaderboard',
       url: '/leaderboard',
     },
+    {
+      title: 'Profile',
+      url: '/profile',
+    },
   ];

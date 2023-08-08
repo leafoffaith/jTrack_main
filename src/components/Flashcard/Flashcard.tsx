@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import FlashcardBack from '../FlashcardBack/FlashcardBack';
 import FlashcardFront from '../FlashcardFront/FlashcardFront';
-import { FlashcardItem } from './FlashcardItem';
 
 interface FlashcardProps {
   // Only using these two as the other things are not required to render the component

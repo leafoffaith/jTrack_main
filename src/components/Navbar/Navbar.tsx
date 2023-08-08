@@ -1,20 +1,27 @@
 //create navbar component
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useHistory } from "react-router-dom";
 import "./Navbar.css";
 import Dropdown from "./Dropdown/Dropdown";
 import { menuItems } from "./menuItems";
 import SuperMemoTest from "../SuperMemo/SuperMemoTest";
 import MenuItemsComponent from "./MenuItemsComponent";
+import { supaClient } from "../Client/supaClient";
 
 const Navbar = () => {
     //dropdown state
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    //handle logout
+    async function signOut() {
+    const { error } = await supaClient.auth.signOut()
 
-    //toggle dropdown
-    const toggleDropdown = () => {
-        setIsDropdownOpen(!isDropdownOpen);
-    };
+        if (error) {
+            console.log('Error signing out:', error.message)
+        } else {
+            console.log('Signed out successfully')
+        }
+    }
+
     return (
 
         <div className="navbar">
@@ -28,8 +35,12 @@ const Navbar = () => {
                     <MenuItemsComponent title={item.title} url={item.url} key={index} />
                 )
             })}
+            {/* <span className="navbar__right__item input-container">
+                <button onClick={signOut}>Sign Out</button>
+            </span> */}
              <span className="navbar__right__item input-container">
-             <input id="Search" type="text" placeholder="Search for Kanji, Sentences and more" className="input-field" />
+             {/* <input id="Search" type="text" placeholder="Search for Kanji, Sentences and more" className="input-field" /> */}
+                 <button onClick={signOut}>Sign Out</button>
              </span>
         </div>
     );

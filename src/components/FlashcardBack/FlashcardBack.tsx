@@ -14,11 +14,10 @@ interface FlashcardBackProps {
       return (
         <div>
           <p>Meaning: {back}</p>
-          <p>Flashcard back content</p>
+          {/* <p>Flashcard back content</p> */}
         </div>
       );
   };
   
   export default FlashcardBack;
-  
   
