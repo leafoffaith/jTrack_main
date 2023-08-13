@@ -23,3 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 .env
+
+#ignore client folder in components
+components/client
