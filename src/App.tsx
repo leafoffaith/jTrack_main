@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useNavigate, BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from 'react-query'
 
 import './App.css'
@@ -9,9 +9,9 @@ import { AuthHandler } from './components/Home/AuthHandler'
 import Login from './components/Login/Login'
 import Profile from './components/Profile/Profile'
 import Leaderboard from './components/Leaderboard/Leaderboard'
-import { Kanji, Learn, Scheduler } from './components'
+import { Kanji, KanjiScheduler, Learn, SentenceScheduler, Sentences } from './components'
 import { supaClient } from './components/Client/supaClient'
-
+import JMDict from './components/JMDict/JMDict'
 
 function App() {
 
@@ -47,10 +47,12 @@ function App() {
       <BrowserRouter>
       <QueryClientProvider client={queryClient}>
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<><Home /></>} />
           <Route path="/learn" element={session ? <Learn /> : <Login />} />
           <Route path="/learn/kanji" element={session ? <Kanji /> : <Login />} />
-          <Route path="/learn/kanji/:title" element={session? <Scheduler /> : <Login />} />
+          <Route path="/learn/kanji/:title" element={session? <KanjiScheduler /> : <Login />} />
+          <Route path="/learn/sentences" element={session ? <Sentences /> : <Login />} />
+          <Route path="/learn/sentences/:title" element={session? <SentenceScheduler /> : <Login />} />
           <Route path="/login" element={session ? <Home /> : <Login />} />
           <Route path="/profile" element={session ? <Profile session={session} /> : <Login />} />
           <Route path="/leaderboard" element={session ? <Leaderboard /> : <Login />} />

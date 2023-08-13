@@ -1,4 +1,4 @@
-import Scheduler from "../SuperMemo/Scheduler";
+import Scheduler from "../SuperMemo/KanjiScheduler";
 import { n5kanjiList } from "./N5KanjiList";
 import useKanjiFetch from "../Fetching/useKanjiFetch";
 import { useQueries, useQuery } from "react-query";

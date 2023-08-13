@@ -8,6 +8,7 @@ import "./Home.css";
 import { supaClient } from "../Client/supaClient";
 import { useEffect } from "react";
 import Login from "../Login/Login";
+import JMDict from "../JMDict/JMDict";
 
 const Home = () => {
 
@@ -32,7 +33,7 @@ const Home = () => {
 
         <div className="home">
          <div className="container" style={{ padding: '50px 0 100px 0' }}>
-             {!session ? <Login /> :  <Navbar />}
+             {!session ? <Login /> :  <><Navbar /></>}
          </div>
            
         </div>

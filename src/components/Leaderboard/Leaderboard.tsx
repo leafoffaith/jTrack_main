@@ -15,6 +15,7 @@ interface leaderboardItem {
 const Leaderboard = () => {
 
     const [leaderboard, setLeaderboard] = useState([]);
+
        async function getLeaderboard(filter: string) {
         //SAMPLE
         // const { data, error } = await supabase
@@ -43,7 +44,7 @@ const Leaderboard = () => {
             console.log(error);
         }
         )
-    },)
+    },[])
 
     return (
         <div className="leaderboard">

@@ -83,16 +83,6 @@ const n3kanjiList = [
 '調',
 ]
 
-
-// const flashcard: Flashcard = {
-//     front: 'What is the capital of France?',
-//     back: 'Paris',
-//     interval: 0,
-//     repetition: 0,
-//     efactor: 2.5,
-//     dueDate: dayjs().toISOString(),
-//   };
-
 //for every kanji in the list, create a new kanji object and push it to a new kanji array
 //map over array, useKanjiFetch and return data
 export const fetchKanjiByLevel = async (level: string) => {

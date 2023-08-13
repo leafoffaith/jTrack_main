@@ -3,6 +3,8 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 const port = 3001;
+const fs = require('fs').promises;
+const path = require('path');
 
 // server.js
 const { Pool } = require('pg');
@@ -33,6 +35,16 @@ app.use(cors({
 //Router
 app.get('/', (req, res) => {
     res.send('Hello World!');
+});
+
+app.get('/getTSV', async (req, res) => {
+  try {
+    const jsonArray = await csv({ delimiter: '\t' }).fromFile('jTrack/src/server/pairs.tsv');
+    console.log("jsonArray:", jsonArray);
+    res.send(jsonArray);
+  } catch (error) {
+    res.send(error);
+  }
 });
 
 //List of all decks available

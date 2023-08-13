@@ -4,6 +4,8 @@ import Learn from "./Learn/Learn";
 import Home from "./Home/Home";
 import Login from "./Login/Login";
 import Kanji from "./Kanji/Kanji";
-import Scheduler from "./SuperMemo/Scheduler";
+import KanjiScheduler from "./SuperMemo/KanjiScheduler";
+import SentenceScheduler from "./SuperMemo/SentenceScheduler";
+import Sentences from "./Sentences/Sentences";
 
-export { Learn, Home, Login, Kanji, Scheduler };
+export { Learn, Home, Login, Kanji, KanjiScheduler, SentenceScheduler, Sentences };
