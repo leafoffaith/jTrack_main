@@ -59,6 +59,38 @@ const readJSON = async () => {
 };
 
 /**
+ * Create a function that returns three alternate sentences from the dictionary to show
+ * as multiple choice options. Ensure that the three random options are not the same as the key being provided.
+  * @param randomKey the key of the sentence that is the correct answer and has already been shown
+  * @returns an array of 3 alternate sentences
+  * @throws an error if the JSON data cannot be read into the dictionary
+  * @async
+ */
+
+const createMultipleChoiceOptions = async (randomKey: string) => {
+  const options: string[] = []
+  try {
+    await readJSON();
+    //create 3 random options
+    for (let i = 0; i < 3; i++) {
+      //get a random key from the dictionary
+      const keys = Object.keys(dict)
+      const randomKey = keys[Math.floor(Math.random() * keys.length)]
+      //check if the key is the same as the randomKey
+       options.push(dict[randomKey])
+      
+    }
+  } catch (error) {
+    console.log(error)
+  }
+  return options
+}
+
+
+
+
+
+/**
  * @returns an array of 10 flashcards created from the dictionary
  * @throws an error if the JSON data cannot be read into the dictionary
  * @param none
@@ -85,8 +117,11 @@ const flashcards: FlashcardItem[] = []
       efactor: 2.5,
       dueDate: dayjs().toISOString(),
     }
+    //generate 3 random options that are the incorrect answers
+    const options = createMultipleChoiceOptions(randomKey)
     //add flashcard item to flashcards array
     flashcards.push(flashcard)
+    //push the 3 options to the flashcard item
   }
     } catch (error) {
       console.log(error) 
@@ -94,4 +129,3 @@ const flashcards: FlashcardItem[] = []
 
   return flashcards;
 } 
-

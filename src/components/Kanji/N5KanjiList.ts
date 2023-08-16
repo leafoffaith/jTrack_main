@@ -2,6 +2,10 @@ import { useKanjifetch } from "../Fetching/useKanjiFetch"
 import { FlashcardItem } from "../Flashcard/FlashcardItem"
 import dayjs from "dayjs"
 
+import JishoAPI from 'unofficial-jisho-api';
+
+const jisho = new JishoAPI();
+
 const n5kanjiList = [
 '日',
 '週',
@@ -83,9 +87,19 @@ const n3kanjiList = [
 '調',
 ]
 
+let demoKanji = {
+    "kanji": "語",
+    "stroke_order_diagram": '',
+    "gif": '', 
+    "svg": ''
+}
+
+
+
 //for every kanji in the list, create a new kanji object and push it to a new kanji array
 //map over array, useKanjiFetch and return data
 export const fetchKanjiByLevel = async (level: string) => {
+   
     let kanjiList: string[] = [];
 
     if(level === 'N5'){
@@ -104,7 +118,22 @@ export const fetchKanjiByLevel = async (level: string) => {
         //create flashcard object for each Kanji
         const flashcard: FlashcardItem = {
             front: kanjiData.kanji,
-            back: kanjiData.meanings[0],
+            // Change back to be an object that contains the following:
+            /**
+             * kanjiData.meanins[0]
+             * kanjiData.kun_readings[]
+             * kanjiData.on_readings[]
+             * kanjiData.name_readings[]
+             * kanjiData.stroke_count
+             * if readings array empty then display none
+             */
+            kanjiBack: {
+                meaning: kanjiData.meanings[0],
+                kun_readings: kanjiData.kun_readings,
+                on_readings: kanjiData.on_readings,
+                name_readings: kanjiData.name_readings,
+                stroke_count: kanjiData.stroke_count,
+            },
             interval: 0,
             repetition: 0,
             efactor: 2.5,

@@ -100,12 +100,26 @@ const KanjiScheduler = (): JSX.Element => {
   //pass down the state of the visiblity of the flashcard back component from here
   const [isFlipped, setIsFlipped] = useState(false);
 
+  //reset isFlipped state to false when the current flashcard changes after a timeout of 3 seconds 
+  useEffect(() => {
+     setIsFlipped(false);
+  }
+  , [currentFlashcard]);
+
    return (
     <div>
       {currentFlashcard && isDue ? (
         <div>
-          <Flashcard front={currentFlashcard.front} flipped={isFlipped} back={currentFlashcard.back} practice={practice}/> 
-          <button onClick={() => setIsFlipped(!isFlipped)}>Show answer</button>
+          {/* if flashcard has Kanjiback pass that instead of back */}
+          <Flashcard
+            front={currentFlashcard.front}
+            back={currentFlashcard.back}
+            kanjiBack={currentFlashcard.kanjiBack}
+            flipped={isFlipped}
+            setIsFlipped={setIsFlipped}
+            practice={practice}
+          />
+          {/* <button onClick={() => setIsFlipped(!isFlipped)}>Show answer</button> */}
         </div>
       ) : (
         <div>

@@ -1,10 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import { supermemo, SuperMemoGrade } from 'supermemo'
 import Flashcard from '../Flashcard/Flashcard';
 import { FlashcardItem } from '../Flashcard/FlashcardItem';
-import { useParams } from 'react-router-dom';
-import { fetchKanjiByLevel } from '../Kanji/N5KanjiList';
 import { createSentenceFlashcards } from '../JMDict/JMDict';
 
 interface UpdatedFlashcard extends FlashcardItem {
@@ -18,17 +16,11 @@ const SentenceScheduler = (): JSX.Element => {
   //practiced flashcards array
   const [practicedFlashcards, setPracticedFlashcards] = useState<UpdatedFlashcard[]>([]);
 
-  // title state
-//   const { title } = useParams<{ title: string }>();
-
-
   //fetches kanji data
   useEffect(() => {
-    console.log("this is running")
     // fetchKanjiData();
     const fetchSentenceData = async () => {
         try {
-            console.log("this is running too")
             const data = await createSentenceFlashcards();
             setSentenceData(data);
             console.log(sentenceData)
@@ -37,15 +29,23 @@ const SentenceScheduler = (): JSX.Element => {
         }
         }
 
-        fetchSentenceData();
+        fetchSentenceData()
+        .then(() => {
+            console.log("Sentence data fetched successfully")
+        }
+        ).catch((error) => {
+            console.log(error)
+        }
+        )
   }, []);
 
 
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
 
   /** 
-   *  Pratice function logic that uses practiceFlashcard function
+   *@abstract Pratice function logic that uses practiceFlashcard function
     @PARAM grade - the grade of the flashcard that is being practiced
+    @RETURN void
   */
   const practice = (grade: SuperMemoGrade): void => {
     const currentFlashcard = sentenceData[currentCardIndex];
@@ -104,12 +104,19 @@ const SentenceScheduler = (): JSX.Element => {
   //pass down the state of the visiblity of the flashcard back component from here
   const [isFlipped, setIsFlipped] = useState(false);
 
+    //reset isFlipped state to false when the current flashcard changes after a timeout of 3 seconds 
+    useEffect(() => {
+        setIsFlipped(false);
+    }
+    , [currentFlashcard]);
+
+
    return (
     <div>
       {currentFlashcard && isDue ? (
         <div>
-          <Flashcard front={currentFlashcard.front} flipped={isFlipped} back={currentFlashcard.back} practice={practice}/> 
-          <button onClick={() => setIsFlipped(!isFlipped)}>Show answer</button>
+           <Flashcard front={currentFlashcard.front} flipped={isFlipped} setIsFlipped={setIsFlipped} back={currentFlashcard.back} practice={practice}/> 
+          {/* <button onClick={() => setIsFlipped(!isFlipped)}>Show answer</button> */}
         </div>
       ) : (
         <div>

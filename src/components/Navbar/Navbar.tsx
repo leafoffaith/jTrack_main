@@ -1,11 +1,7 @@
 //create navbar component
 import { Link } from "react-router-dom";
-import { useState, useEffect } from "react";
-import { useHistory } from "react-router-dom";
 import "./Navbar.css";
-import Dropdown from "./Dropdown/Dropdown";
 import { menuItems } from "./menuItems";
-import SuperMemoTest from "../SuperMemo/SuperMemoTest";
 import MenuItemsComponent from "./MenuItemsComponent";
 import { supaClient } from "../Client/supaClient";
 
@@ -13,13 +9,14 @@ const Navbar = () => {
     //dropdown state
     //handle logout
     async function signOut() {
-    const { error } = await supaClient.auth.signOut()
+        const { error } = await supaClient.auth.signOut()
 
-        if (error) {
-            console.log('Error signing out:', error.message)
-        } else {
-            console.log('Signed out successfully')
-        }
+            if (error) {
+                console.log('Error signing out:', error.message)
+            } else {
+                console.log('Signed out successfully')
+            }
+            
     }
 
     return (
