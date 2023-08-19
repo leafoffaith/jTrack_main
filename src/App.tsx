@@ -5,13 +5,12 @@ import { QueryClient, QueryClientProvider } from 'react-query'
 import './App.css'
 //to be replaced by Index 
 import Home from './components/Home/Home'
-import { AuthHandler } from './components/Home/AuthHandler'
 import Login from './components/Login/Login'
 import Profile from './components/Profile/Profile'
 import Leaderboard from './components/Leaderboard/Leaderboard'
 import { Kanji, KanjiScheduler, Learn, SentenceScheduler, Sentences } from './components'
 import { supaClient } from './components/Client/supaClient'
-import JMDict from './components/JMDict/JMDict'
+import HiraganaScheduler from './components/SuperMemo/HiraganaScheduler'
 
 function App() {
 
@@ -53,6 +52,7 @@ function App() {
           <Route path="/learn/kanji/:title" element={session? <KanjiScheduler /> : <Login />} />
           <Route path="/learn/sentences" element={session ? <Sentences /> : <Login />} />
           <Route path="/learn/sentences/:title" element={session? <SentenceScheduler /> : <Login />} />
+          <Route path="/learn/hiragana" element={session? <HiraganaScheduler /> : <Login />} />
           <Route path="/login" element={session ? <Home /> : <Login />} />
           <Route path="/profile" element={session ? <Profile session={session} /> : <Login />} />
           <Route path="/leaderboard" element={session ? <Leaderboard /> : <Login />} />

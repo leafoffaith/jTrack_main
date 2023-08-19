@@ -5,7 +5,6 @@
 */
 
 import React, { useState } from 'react';
-import * as wanakana from 'wanakana';
 
 interface FlashcardBackProps {
        back?: string;
@@ -40,7 +39,7 @@ interface FlashcardBackProps {
           
           :
           <div>
-            <p>{back}</p>
+            <h3>Answer: {back}</h3>
           </div>
           }
           {/* <p>Flashcard back content</p> */}

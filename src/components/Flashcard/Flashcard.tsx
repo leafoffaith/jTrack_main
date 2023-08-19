@@ -65,7 +65,7 @@ const Flashcard: React.FC<FlashcardProps> = ({flipped, setIsFlipped, practice, f
               <button onClick={() => practice!(1)}>Hard</button>
             </div>
           }
-          <button onClick={() => setIsFlipped(true)}>Show answer</button>
+          {!flipped && <button onClick={() => setIsFlipped(true)}>Show answer</button>}
         </div>
          {/* Timer display */}
         <div>Time left: {timer} seconds</div>
