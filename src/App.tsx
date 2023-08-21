@@ -4,13 +4,22 @@ import { QueryClient, QueryClientProvider } from 'react-query'
 
 import './App.css'
 //to be replaced by Index 
-import Home from './components/Home/Home'
-import Login from './components/Login/Login'
-import Profile from './components/Profile/Profile'
 import Leaderboard from './components/Leaderboard/Leaderboard'
-import { Kanji, KanjiScheduler, Learn, SentenceScheduler, Sentences } from './components'
+import { 
+  About, 
+  Login,
+  Profile,
+  Home,
+  Kanji, 
+  KanjiScheduler, 
+  Learn, 
+  SentenceScheduler, 
+  Sentences } 
+  from './components'
 import { supaClient } from './components/Client/supaClient'
 import HiraganaScheduler from './components/SuperMemo/HiraganaScheduler'
+import KatakanaScheduler from './components/SuperMemo/KatakanaScheduler'
+import { Achievements } from './components/Achievements/Achievements'
 
 function App() {
 
@@ -53,9 +62,12 @@ function App() {
           <Route path="/learn/sentences" element={session ? <Sentences /> : <Login />} />
           <Route path="/learn/sentences/:title" element={session? <SentenceScheduler /> : <Login />} />
           <Route path="/learn/hiragana" element={session? <HiraganaScheduler /> : <Login />} />
+          <Route path="/learn/katakana" element={session? <KatakanaScheduler /> : <Login />} />
           <Route path="/login" element={session ? <Home /> : <Login />} />
           <Route path="/profile" element={session ? <Profile session={session} /> : <Login />} />
           <Route path="/leaderboard" element={session ? <Leaderboard /> : <Login />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/awards" element={<Achievements />} />
         </Routes>
       </QueryClientProvider>
     </BrowserRouter>

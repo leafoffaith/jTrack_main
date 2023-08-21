@@ -3,7 +3,7 @@ import dayjs from 'dayjs';
 import { supermemo, SuperMemoGrade } from 'supermemo'
 import Flashcard from '../Flashcard/Flashcard';
 import { FlashcardItem } from '../Flashcard/FlashcardItem';
-import { createSentenceFlashcards } from '../JMDict/JMDict';
+import { createSentenceFlashcards, createMultipleChoiceOptions } from '../JMDict/JMDict';
 
 interface UpdatedFlashcard extends FlashcardItem {
   dueDate: string;
@@ -11,13 +11,23 @@ interface UpdatedFlashcard extends FlashcardItem {
 //Start of Scheduler component
 const SentenceScheduler = (): JSX.Element => {
 
+  //STATES
   const [sentenceData, setSentenceData] = useState<[]>([]);
   
   //practiced flashcards array
   const [practicedFlashcards, setPracticedFlashcards] = useState<UpdatedFlashcard[]>([]);
 
+  //state for the options that will be generated alongside the flashcard and will be an array of arrays
+  const [options, setOptions] = useState<[]>([]);
+
+  //pass down the state of the visiblity of the flashcard back component from here
+  const [isFlipped, setIsFlipped] = useState(false);
+  
+  const [currentCardIndex, setCurrentCardIndex] = useState(0);
+
   //fetches kanji data
   useEffect(() => {
+
     // fetchKanjiData();
     const fetchSentenceData = async () => {
         try {
@@ -40,7 +50,6 @@ const SentenceScheduler = (): JSX.Element => {
   }, []);
 
 
-  const [currentCardIndex, setCurrentCardIndex] = useState(0);
 
   /** 
    *@abstract Pratice function logic that uses practiceFlashcard function
@@ -101,8 +110,7 @@ const SentenceScheduler = (): JSX.Element => {
   //  console.log(currentFlashcard)
   const isDue = currentFlashcard && isFlashcardDue(currentFlashcard.dueDate);
   
-  //pass down the state of the visiblity of the flashcard back component from here
-  const [isFlipped, setIsFlipped] = useState(false);
+
 
     //reset isFlipped state to false when the current flashcard changes after a timeout of 3 seconds 
     useEffect(() => {
@@ -110,13 +118,24 @@ const SentenceScheduler = (): JSX.Element => {
     }
     , [currentFlashcard]);
 
+    
+    useEffect(() => {
+      const fetchOptions = async () => {
+        if (currentFlashcard) {
+          const options = await createMultipleChoiceOptions(currentFlashcard);
+          setOptions(options);
+        }
+      };
+    
+      fetchOptions(); // Call the async function
+    }, [currentFlashcard])
 
    return (
     <div>
       {currentFlashcard && isDue ? (
         <div>
-           <Flashcard front={currentFlashcard.front} flipped={isFlipped} setIsFlipped={setIsFlipped} back={currentFlashcard.back} practice={practice}/> 
-          {/* <button onClick={() => setIsFlipped(!isFlipped)}>Show answer</button> */}
+           <Flashcard options={options} front={currentFlashcard.front} flipped={isFlipped} setIsFlipped={setIsFlipped} back={currentFlashcard.back} practice={practice}/> 
+            {/* <h1>{options[0]}</h1> */}
         </div>
       ) : (
         <div>

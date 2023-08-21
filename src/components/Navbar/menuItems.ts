@@ -1,7 +1,7 @@
 export const menuItems = [
     {
       title: 'Home',
-      url: '/',
+      url: '/home',
     },
     {
       title: 'Learn',
@@ -21,10 +21,10 @@ export const menuItems = [
         },
       ]
     },
-    {
-      title: 'About',
-      url: '/about',
-    },
+    // {
+    //   title: 'About',
+    //   url: '/about',
+    // },
     {
       title: 'Login',
       url: '/Login',

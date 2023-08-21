@@ -5,9 +5,10 @@ import { getHint1 } from '../../Fetching/getHint1';
 
 interface FlashcardFrontProps {
   front: string
+  flipped: boolean | undefined;
 }
 
-const FlashcardFront: React.FC<FlashcardFrontProps> = ({ front }) => {
+const FlashcardFront: React.FC<FlashcardFrontProps> = ({ front, flipped }) => {
 
   //state for converted kanji
   const [sent, setSent] = useState('');
@@ -59,7 +60,7 @@ const FlashcardFront: React.FC<FlashcardFrontProps> = ({ front }) => {
       {!hintButton && <div>
           <h2>Hint: <span dangerouslySetInnerHTML={{ __html: sent }} /></h2>
           {/* Render the button only if it's visible */}
-          <button onClick={hint}>Get hint</button>
+          {!flipped && <button onClick={hint}>Get hint</button>}
       </div>}
       
       

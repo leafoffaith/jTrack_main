@@ -11,6 +11,29 @@
   z-index: 1;
 }
 
+/* Media query for responsiveness */
+@media screen and (max-width: 800px) {
+  #noDis, .navbar__right__item {
+    float: none; /* Remove float */
+    display: none; /* Display links vertically */
+    text-align: left; /* Align text to the left */
+    padding: 10px; /* Reduce padding for smaller screens */
+    font-size: 16px; /* Adjust font size */
+  }
+
+  #oc {
+    background-color: white;
+  }
+
+  #menu {
+    display: block;
+  }
+}
+
+ menuitem {
+    display: none;
+ }
+
 /* Style the links inside the navbar */
 .navbar a {
   float: left;

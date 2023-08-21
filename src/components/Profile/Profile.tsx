@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import { supaClient } from '../Client/supaClient'
 import Avatar from './Avatar'
 import Navbar from '../Navbar/Navbar'
+import StatsPage from './Stats'
+import Progress from './Progress'
 
 export default function Account({ session }) {
   const [loading, setLoading] = useState(true)
@@ -15,9 +17,8 @@ export default function Account({ session }) {
       const { user } = session
 
       let { data, error } = await supaClient
-        .from('profiles')
+        .from('auth.users')
         .select(`username, website, avatar_url`)
-        .eq('id', user.id)
         .single()
 
       if (error) {
@@ -60,17 +61,47 @@ export default function Account({ session }) {
 
   return (
     <>
-    <div className="container" style={{ padding: '50px 0 100px 0' }}>
-              <Navbar />
+    <div>
+      <Navbar />
     </div>
-    <form onSubmit={updateProfile} className="form-widget">
-      <Avatar
-        url={avatar_url}
-        size={150}
-        onUpload={(event, url) => {
-          updateProfile(event, url)
-        }}
-      />
+    <div style={{
+      marginTop: '5rem',
+    }}>
+      <h1>Welcome back Shaurya Dey!</h1>
+    <div className='flashcard card'>
+      <StatsPage />
+      <h4>Upcoming reviews</h4>
+      <hr />
+      <span style={{
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-evenly',
+        alignItems: 'center',
+      }}>
+        <h2>Kanji Mastered</h2>
+        <h2>Vocabulary Mastered</h2>
+        <h2>Study Streak</h2>
+      </span>
+      <span style={{
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-evenly',
+        alignItems: 'center',
+      }}>
+        <h3>20</h3>
+        <h3>37</h3>
+        <h3>10</h3>
+      </span>
+    </div>
+   
+    <form onSubmit={updateProfile} style={{
+      maxWidth: '40%',
+      margin: '0 auto',
+      padding: '1rem',
+      display: 'flex',
+      flexDirection: 'column',
+    }}>
+      <h3>Change your account details</h3>
       <div>
         <label htmlFor="email">Email</label>
         <input id="email" type="text" value={session.user.email} disabled />
@@ -107,6 +138,8 @@ export default function Account({ session }) {
         </button>
       </div>
     </form>
+    </div>
+    
     </>
   )
 }

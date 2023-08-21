@@ -33,9 +33,9 @@ const Learn = () => {
 
     return (
         <div>
-            <div className="container" style={{ padding: '50px 0 100px 0' }}>
-              <Navbar />
-            </div>
+            <div className="header-navbar">
+                <Navbar />
+              </div>
             {/* Render DeckSelect with fetched 'decks' */}
             <DeckSelect deckList={deckData}/>
         </div>

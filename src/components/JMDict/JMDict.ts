@@ -34,6 +34,12 @@ interface Dict {
   [key: string]: string;
 }
 
+//interface for flashcard with options object
+interface FlashcardWithOptions {
+  flashcard: FlashcardItem,
+  options: string[]
+}
+
 //init state as a dictionary
 const dict: Dict = {} as Dict
 
@@ -67,7 +73,7 @@ const readJSON = async () => {
   * @async
  */
 
-const createMultipleChoiceOptions = async (randomKey: string) => {
+export const createMultipleChoiceOptions = async (passedKey: string) => {
   const options: string[] = []
   try {
     await readJSON();
@@ -75,10 +81,14 @@ const createMultipleChoiceOptions = async (randomKey: string) => {
     for (let i = 0; i < 3; i++) {
       //get a random key from the dictionary
       const keys = Object.keys(dict)
-      const randomKey = keys[Math.floor(Math.random() * keys.length)]
+      let randomKey = keys[Math.floor(Math.random() * keys.length)]
       //check if the key is the same as the randomKey
-       options.push(dict[randomKey])
-      
+      while (randomKey === passedKey) {
+        //if it is, get another random key
+        randomKey = keys[Math.floor(Math.random() * keys.length)]
+      }
+      //push the random key to the options array
+      options.push(dict[randomKey])
     }
   } catch (error) {
     console.log(error)
@@ -100,6 +110,7 @@ const createMultipleChoiceOptions = async (randomKey: string) => {
 //create 10 new flashcards from the dictionary
 export const createSentenceFlashcards = async () => {
 const flashcards: FlashcardItem[] = []
+
   try {
     await readJSON();
     //array to store flashcard items
@@ -118,7 +129,7 @@ const flashcards: FlashcardItem[] = []
       dueDate: dayjs().toISOString(),
     }
     //generate 3 random options that are the incorrect answers
-    const options = createMultipleChoiceOptions(randomKey)
+   
     //add flashcard item to flashcards array
     flashcards.push(flashcard)
     //push the 3 options to the flashcard item

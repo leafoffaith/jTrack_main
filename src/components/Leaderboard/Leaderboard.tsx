@@ -17,14 +17,6 @@ const Leaderboard = () => {
     const [leaderboard, setLeaderboard] = useState([]);
 
        async function getLeaderboard(filter: string) {
-        //SAMPLE
-        // const { data, error } = await supabase
-        // .from('countries')
-        // .select()
-        
-        //if a filter is passed in, use it to sort the leaderboard
-        //when the data is fetched, it also fetches foreign table    
-        //eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
             const {data: testData, error } = await supaClient.from('User_study_data').select(`
                 words_mastered, study_streak, kanji_mastered,
                 primary_user_data (user_data_id, name)
@@ -48,7 +40,7 @@ const Leaderboard = () => {
 
     return (
         <div className="leaderboard">
-            <div className="container" style={{ padding: '50px 0 100px 0' }}>
+            <div className="header-navbar">
               <Navbar />
             </div>
             <h1>Leaderboard</h1>

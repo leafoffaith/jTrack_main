@@ -15,9 +15,11 @@ interface FlashcardBackProps {
         name_readings: [],
         stroke_count: number
        }
+       options?: string[];
+       front?: string;
   }   
   
-  const FlashcardBack: React.FC<FlashcardBackProps> = ({ back, kanjiBack }) => {
+  const FlashcardBack: React.FC<FlashcardBackProps> = ({ back, kanjiBack, front }) => {
     //split and join readings with commas and give each a different color
     let kunReadings, onReadings, nameReadings = '';
     kanjiBack?.kun_readings[0] ?  kunReadings = kanjiBack?.kun_readings.join(', ') :  kunReadings = 'no readings to remember';
@@ -34,9 +36,8 @@ interface FlashcardBackProps {
             <p>On readings: {onReadings}</p>
             <p>Name readings: {nameReadings}</p>
             <p>Stroke count: {kanjiBack.stroke_count}</p>
-          </div>
-          // tokenized back
-          
+            <p className='stroke-order'>{front}</p>
+          </div>  
           :
           <div>
             <h3>Answer: {back}</h3>

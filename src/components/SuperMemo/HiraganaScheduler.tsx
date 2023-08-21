@@ -21,7 +21,10 @@ const HiraganaScheduler = (): JSX.Element => {
     createHiraganaFlashcards().then((data) => {
       console.log(data)
       setHiraganaData(data);
-    });
+    }).catch((err) => {
+      console.log(err);
+    }
+    );
   }
   , []);
 

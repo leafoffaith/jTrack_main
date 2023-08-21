@@ -7,5 +7,7 @@ import Kanji from "./Kanji/Kanji";
 import KanjiScheduler from "./SuperMemo/KanjiScheduler";
 import SentenceScheduler from "./SuperMemo/SentenceScheduler";
 import Sentences from "./Sentences/Sentences";
+import { About } from "./About/About";
+import Profile from "./Profile/Profile";
 
-export { Learn, Home, Login, Kanji, KanjiScheduler, SentenceScheduler, Sentences };
+export { Profile, About, Learn, Home, Login, Kanji, KanjiScheduler, SentenceScheduler, Sentences };

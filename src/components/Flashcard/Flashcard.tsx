@@ -17,14 +17,17 @@ interface FlashcardProps {
     flipped?: boolean;
     setIsFlipped: React.Dispatch<React.SetStateAction<boolean>>;
     practice?: (grade: SuperMemoGrade) => void;
+    options?: string[];
   }
 
 
-const Flashcard: React.FC<FlashcardProps> = ({flipped, setIsFlipped, practice, front, back, kanjiBack}) => {
+const Flashcard: React.FC<FlashcardProps> = ({options, flipped, setIsFlipped, practice, front, back, kanjiBack}) => {
 
 
   //timer state for the flashcard
   const [timer, setTimer] = useState(60);
+
+  const [flip, setFlip] = useState(false)
 
   //auto fail after a timout of 60 seconds
   useEffect(() => {
@@ -46,29 +49,41 @@ const Flashcard: React.FC<FlashcardProps> = ({flipped, setIsFlipped, practice, f
   }
   , [front, back]);
 
+  const handleBothClicks = () => {
+    setFlip(!flip);
+    setIsFlipped(true);
+  }
+
     return (
-      <div className="flashcard">
+      <div className="flashcard card">
         {/* check if options array exists in the flashcard object */}
         <div>
           {/* The front and back come from props used to render the flashcard */}
-          <FlashcardFront front={front} />
-          {/* button that controls visiblity of the back  */}
-          {/* <button onClick={() => setVisible(!visible)}>Show Answer</button> */}
-          {/* conditionally render back of the flashcard if user has clicked on button to show answer*/}
-          {flipped && 
-            <div>
-              {/* If kanjiBack exists pass that instead of normal back */}
-              {kanjiBack ? <FlashcardBack kanjiBack={kanjiBack}/> : <FlashcardBack back={back}/>}
-              {/* Practice buttons */}
-              <button onClick={() => practice!(5)}>Easy</button>
-              <button onClick={() => practice!(3)}>Medium</button>
-              <button onClick={() => practice!(1)}>Hard</button>
+          <div>
+              <FlashcardFront front={front} flipped={flipped} />
+              {options &&
+                <div className='buttons'>
+                  <button onClick={() => practice!(1)}>{options[0]}</button>
+                  <button onClick={() => practice!(1)}>{options[1]}</button>
+                  <button onClick={() => practice!(1)}>{options[2]}</button>
+                  <button onClick={() => practice!(5)}>{back}</button>
+                </div>
+              }
+              {flipped && 
+                <div>
+                  {/* If kanjiBack exists pass that instead of normal back */}
+                  {kanjiBack ? <FlashcardBack front={front} kanjiBack={kanjiBack}/> : <FlashcardBack back={back} />}
+                  {/* Practice buttons */}
+                  <button onClick={() => practice!(5)}>Easy</button>
+                  <button onClick={() => practice!(3)}>Medium</button>
+                  <button onClick={() => practice!(1)}>Hard</button>
+                </div>
+              }
+              {!options && !flipped && <button onClick={() => handleBothClicks()}>Show answer</button>}
             </div>
-          }
-          {!flipped && <button onClick={() => setIsFlipped(true)}>Show answer</button>}
-        </div>
-         {/* Timer display */}
-        <div>Time left: {timer} seconds</div>
+            {/* Timer display */}
+            <div>Time left: {timer} seconds</div>
+          </div>
       </div>
     );
   };
