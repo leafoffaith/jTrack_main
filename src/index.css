@@ -30,7 +30,7 @@
 
 .buttons-deck {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   margin: auto;
@@ -58,7 +58,7 @@
 .card {
   height: 100%;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   position: relative;
@@ -92,7 +92,7 @@ img {
 }
 
 /* At smaller viewport .cardDeck should be the flex direction column or vertical */
-@media (max-width: 600px) {
+@media (max-width: 800px) {
   .buttons-deck {
     display: flex;
     flex-direction: column;
@@ -459,11 +459,14 @@ button.primary,
 }
 
 /* Widgets */
+.cardDeck {
+  display: flex;
+  flex-direction: column;
+}
 
 .cardDeck,
 .card {
   width: 100%;
-  display: block;
   border: var(--custom-border);
   border-radius: var(--custom-border-radius);
   padding: var(--custom-spacing);

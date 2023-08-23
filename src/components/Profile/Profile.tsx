@@ -117,7 +117,7 @@ export default function Account({ session }) {
         />
       </div>
       <div>
-        <label htmlFor="website">Website</label>
+        <label htmlFor="website">Password</label>
         <input
           id="website"
           type="url"

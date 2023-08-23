@@ -24,6 +24,7 @@ interface DeckSelectProps {
 const DeckSelect: React.FC<DeckSelectProps> = ({ deckList }): JSX.Element => {
     return (
         <div id='oc' className='buttons-deck'>
+          <h2>No cards currently queued for review!</h2>
             {deckList.map((deck: Deck) => {
         return (
               <div className='cardDeck' key={deck.deck_id}> {/* Added key prop with a unique identifier */} 
