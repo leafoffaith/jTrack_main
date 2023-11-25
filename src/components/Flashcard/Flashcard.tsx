@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import FlashcardBack from './FlashcardBack/FlashcardBack';
 import FlashcardFront from './FlashcardFront/FlashcardFront';
 import { SuperMemoGrade } from 'supermemo';
@@ -23,7 +23,22 @@ interface FlashcardProps {
 
 const Flashcard: React.FC<FlashcardProps> = ({options, flipped, setIsFlipped, practice, front, back, kanjiBack}) => {
 
+  let main;
+  //array with back and options
+  if(options) {
+    main = [back, ...options];
+  }
 
+  let primaryArray;
+  if(main?.length > 0 ){
+     //randomize the order of the array
+      primaryArray = useMemo(() => { 
+      return main.sort(() => Math.random() - 0.5)
+    }
+    , [back, options]);
+  }
+
+  
   //timer state for the flashcard
   const [timer, setTimer] = useState(60);
 
@@ -54,6 +69,45 @@ const Flashcard: React.FC<FlashcardProps> = ({options, flipped, setIsFlipped, pr
     setIsFlipped(true);
   }
 
+  // state for button 
+  const [correct, setCorrect] = useState('');
+
+
+  // Button class handler
+  const handleButtonClass = (option: string) => {
+    if (option === "correct") {
+      setCorrect('correctButton');
+    } else if (option === "incorrect") {
+      setCorrect('incorrectButton');
+    }
+    return 'buttons';
+  };
+
+
+  // handle practice button 1
+  const handlePractice1 = () => {
+    handleButtonClass("incorrect");
+   alert("Incorrect!")
+      practice!(1);
+  }
+
+  // handle practice button 5
+  const handlePractice5 = () => {
+    handleButtonClass("correct");
+    alert("Correct!")
+      practice!(5);
+
+  }
+
+  //function that renders the buttons
+  const renderButtons = () => {
+    return primaryArray.map((option, index) => (
+      option === back ? <button key={index} onClick={() => handlePractice5()} className={correct}>{option}</button> : <button key={index} onClick={() => handlePractice1()} className={correct}>{option}</button>
+    ))
+  }
+
+
+
     return (
       <div className="flashcard card">
         {/* check if options array exists in the flashcard object */}
@@ -62,11 +116,10 @@ const Flashcard: React.FC<FlashcardProps> = ({options, flipped, setIsFlipped, pr
           <div>
               <FlashcardFront front={front} flipped={flipped} />
               {options &&
-                <div className='buttons'>
-                  <button onClick={() => practice!(1)}>{options[0]}</button>
-                  <button onClick={() => practice!(1)}>{options[1]}</button>
-                  <button onClick={() => practice!(1)}>{options[2]}</button>
-                  <button onClick={() => practice!(5)}>{back}</button>
+                <div className={"buttons"} >
+                  {/* randomly display order of buttons */}
+                  {/* use render buttons function */}
+                  {renderButtons()}
                 </div>
               }
               {flipped && 

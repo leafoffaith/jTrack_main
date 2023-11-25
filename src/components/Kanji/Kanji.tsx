@@ -3,6 +3,7 @@ import { n5kanjiList } from "./N5KanjiList";
 import useKanjiFetch from "../Fetching/useKanjiFetch";
 import { useQueries, useQuery } from "react-query";
 import { Link } from "react-router-dom";
+import Navbar from "../Navbar/Navbar";
 
 const Kanji = (props: any) => {
 
@@ -16,6 +17,10 @@ const Kanji = (props: any) => {
     return (
         <>
          <div>
+            {/* header navbar div */}
+            <div className='header'>
+                <Navbar />
+            </div>
             <h2>Please choose a deck!</h2>
             {kArray.map((k) => {
                 return (

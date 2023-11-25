@@ -4,6 +4,7 @@ import { supermemo, SuperMemoGrade } from 'supermemo'
 import Flashcard from '../Flashcard/Flashcard';
 import { FlashcardItem } from '../Flashcard/FlashcardItem';
 import { createSentenceFlashcards, createMultipleChoiceOptions } from '../JMDict/JMDict';
+import Navbar from '../Navbar/Navbar';
 
 interface UpdatedFlashcard extends FlashcardItem {
   dueDate: string;
@@ -132,6 +133,9 @@ const SentenceScheduler = (): JSX.Element => {
 
    return (
     <div>
+      <div className="header-navbar">
+        <Navbar />
+      </div>
       {currentFlashcard && isDue ? (
         <div>
            <Flashcard options={options} front={currentFlashcard.front} flipped={isFlipped} setIsFlipped={setIsFlipped} back={currentFlashcard.back} practice={practice}/> 

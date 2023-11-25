@@ -3,9 +3,8 @@ import dayjs from 'dayjs';
 import { supermemo, SuperMemoGrade } from 'supermemo'
 import Flashcard from '../Flashcard/Flashcard';
 import { FlashcardItem } from '../Flashcard/FlashcardItem';
-// import { createHiraganaFlashcards } from '../Fetching/useHiraganaFetch';
 import { createKatakanaFlashcards } from '../Fetching/useKatakanaFetch';
-
+import Navbar from '../Navbar/Navbar';
 interface UpdatedFlashcard extends FlashcardItem {
   dueDate: string;
 }
@@ -101,6 +100,9 @@ const KatakanaScheduler = (): JSX.Element => {
 
    return (
     <div>
+      <div className="header-navbar">
+        <Navbar />
+      </div>
       {currentFlashcard && isDue ? (
         <div>
           {/* if flashcard has Kanjiback pass that instead of back */}

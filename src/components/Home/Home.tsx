@@ -1,40 +1,31 @@
-//create Home component that will use the navbar component
 
-//silence the error for now
-// eslint-disable-next-line
+/**
+ * @file Home.tsx is the home page for the application. It contains instructions for the user to follow
+ * when using the application. It also contains a navbar component that allows the user to navigate to
+ * different pages.
+ * @author Shaurya Dey s.dey2@ncl.ac.uk
+ */
 import Navbar from "../Navbar/Navbar";
-import { useState } from "react";
 import "./Home.css";
-import { supaClient } from "../Client/supaClient";
-import { useEffect } from "react";
-import Login from "../Login/Login";
-import JMDict from "../JMDict/JMDict";
+
 
 const Home = () => {
-
-    const [session, setSession] = useState(null)
-
-    useEffect(() => {
-      supaClient.auth.getSession().then(({ data: { session } }) => {
-        setSession(session);
-      }).then(() => {
-        console.log(session);
-        }).catch((error) => {
-            console.log(error);
-        })
-  
-      supaClient.auth.onAuthStateChange((_event, session) => {
-        setSession(session);
-      })
-    }, [])
-
     
     return (
 
         <div className="home">
          <div className="container" style={{ padding: '50px 0 100px 0' }}>
-             {!session ? <Login /> :  <><Navbar /></>}
+             <Navbar />
          </div>
+         {/* Instructions for flashcard review */}
+        <div>
+            <h1 className="instructions">Instructions</h1>
+            <p className="instructions">1. Click on the "Learn" tab to select a new deck to learn.</p>
+            <p>2. Select your deck and which JLPT level you are comfortable with</p>
+            <p>3. For the multiple choice flashcards select the option you think is correct</p>
+            <p>6. For the flashcards with a kanji on the front, try and see if you can recall what the meaning of the Kanji is</p>
+            <p>Complete Hiragana and Katakana first before moving to other decks!</p>
+        </div>
            
         </div>
     );

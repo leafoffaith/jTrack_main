@@ -1,16 +1,18 @@
-import React, { useEffect, useState } from 'react';
+import { DO_NOT_USE_OR_YOU_WILL_BE_FIRED_EXPERIMENTAL_FORM_ACTIONS, useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import { supermemo, SuperMemoGrade } from 'supermemo'
 import Flashcard from '../Flashcard/Flashcard';
 import { FlashcardItem } from '../Flashcard/FlashcardItem';
 import { useParams } from 'react-router-dom';
 import { fetchKanjiByLevel } from '../Kanji/N5KanjiList';
+import Navbar from '../Navbar/Navbar';
 
 interface UpdatedFlashcard extends FlashcardItem {
   dueDate: string;
 }
 //Start of Scheduler component
 const KanjiScheduler = (): JSX.Element => {
+
 
   const [kanjiData, setKanjiData] = useState<[]>([]);
   
@@ -20,14 +22,16 @@ const KanjiScheduler = (): JSX.Element => {
   // title state
   const { title } = useParams<{ title: string }>();
 
-
   //fetches kanji data
   useEffect(() => {
     const fetchKanjiData = async () => {
+
       try {
         const data = await fetchKanjiByLevel(title);
+        //get the first 10 only
+        const firstTen = data.slice(0, 10);
         // console.log(data);
-        setKanjiData(data);
+        setKanjiData(firstTen);
       } catch (error) {
         console.error('Error fetching kanji data:', error);
       }
@@ -65,6 +69,8 @@ const KanjiScheduler = (): JSX.Element => {
     if (currentCardIndex === kanjiData.length - 1) {
       setCurrentCardIndex(0);
       setKanjiData(practicedFlashcards);
+      //set local storage to true
+      setReviewed(true);
     }
   };
 
@@ -108,6 +114,9 @@ const KanjiScheduler = (): JSX.Element => {
 
    return (
     <div>
+      <div className="header-navbar">
+        <Navbar />
+      </div>
       {currentFlashcard && isDue ? (
         <div>
           {/* if flashcard has Kanjiback pass that instead of back */}

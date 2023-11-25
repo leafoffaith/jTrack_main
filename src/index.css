@@ -28,25 +28,36 @@
   width: 80%;
 }
 
+
 .buttons-deck {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
   margin: auto;
   width: 80%;
-}
+}/* Shared styles for buttons */
 .cardDeck button,
 .card button {
   background-color: hsl(52, 87%, 38%);
   color: white;
-  padding: .5em 1em;
-  border-radius: .3em;
+  padding: 0.5em 1em;
+  border-radius: 0.3em;
   border: none;
   cursor: pointer;
-  margin-left: .3em;
-  margin-right: .3em;
-  margin-bottom: .3em;
+  margin-left: 0.3em;
+  margin-right: 0.3em;
+  margin-bottom: 0.3em;
+}
+
+/* Styles for correctButton */
+.cardDeck .correctButton button {
+  background-color: hsl(108, 87%, 42%);
+}
+
+/* Styles for incorrectButton */
+.cardDeck .incorrectButton button {
+  background-color: hsl(0, 100%, 55%);
 }
 
 .cardDeck button:hover,
@@ -496,6 +507,34 @@ button.primary,
   flex-flow: row;
   border-top: var(--custom-border);
   background-color: var(--custom-bg-color);
+}
+/* Achievements */
+
+.locked-layer {
+ opacity: 0.5;
+}
+
+.grid-container {
+  display: grid;
+  width: 500px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  padding: 20px;
+}
+
+.grid-item {
+  background-color: #f2f2f2;
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Add media queries for responsiveness */
+@media (max-width: 768px) {
+  .grid-container {
+    grid-template-columns: auto;
+  }
 }
 
 

@@ -1,15 +1,13 @@
 import { useState, useEffect } from 'react'
 import { supaClient } from '../Client/supaClient'
-import Avatar from './Avatar'
 import Navbar from '../Navbar/Navbar'
 import StatsPage from './Stats'
-import Progress from './Progress'
+import { Link } from 'react-router-dom'
 
 export default function Account({ session }) {
   const [loading, setLoading] = useState(true)
   const [username, setUsername] = useState(null)
   const [website, setWebsite] = useState(null)
-  const [avatar_url, setAvatarUrl] = useState(null)
 
   useEffect(() => {
     async function getProfile() {
@@ -72,28 +70,29 @@ export default function Account({ session }) {
       <StatsPage />
       <h4>Upcoming reviews</h4>
       <hr />
-      <span style={{
-        display: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'space-evenly',
-        alignItems: 'center',
+            <div style={{
+        display: 'grid',
+        gridTemplateColumns: '1fr 1fr 1fr',
+        textAlign: 'center',
+        gap: '10px',
       }}>
-        <h2>Kanji Mastered</h2>
-        <h2>Vocabulary Mastered</h2>
-        <h2>Study Streak</h2>
-      </span>
-      <span style={{
-        display: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'space-evenly',
-        alignItems: 'center',
-      }}>
-        <h3>20</h3>
-        <h3>37</h3>
-        <h3>10</h3>
-      </span>
+        <div>
+          <h2>Kanji Mastered</h2>
+          <h3>20</h3>
+        </div>
+        <div>
+          <h2>Vocabulary Mastered</h2>
+          <h3>37</h3>
+        </div>
+        <div>
+          <h2>Study Streak</h2>
+          <h3>10</h3>
+        </div>
+      </div>
+      
     </div>
-   
+        {/* Link to awards page */}
+      <Link to="/awards">View Achievements</Link>
     <form onSubmit={updateProfile} style={{
       maxWidth: '40%',
       margin: '0 auto',

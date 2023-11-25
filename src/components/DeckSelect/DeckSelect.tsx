@@ -2,29 +2,62 @@
  * @description component for selecting a deck
  * @todo query database for all available decks
  * @todo add decks to db with deckID, deckName, deckDescription, deckCards
+ * @author Shaurya Dey 220025500 s.dey2@ncl.ac.uk 
  */
 
-import React from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import Navbar from '../Navbar/Navbar';
-// import Navbar from '../Navbar/NavbarNew';
-
+import { supaClient } from '../Client/supaClient';
 interface Deck {  
     deck_id: number;
     title: string;
 }
 
-/**
- */
-//define props for DeckSelect
 interface DeckSelectProps {
     deckList: Deck[];
 }
     
+
+
+/**
+ * 
+ * @returns deck selection page
+ */
 const DeckSelect: React.FC<DeckSelectProps> = ({ deckList }): JSX.Element => {
+
+  const [totalReviewed, setTotalReviewed] = useState(0);
+
+  const fetchTotalReviewed = async () => {
+    
+      const { data: reviewed, error } = await supaClient
+      .from('TotalReviewed')
+      .select('totalReview')
+      .then()
+
+      if(error){
+        console.log(error)
+      } else {
+        console.log(reviewed[0].totalReview)
+        return reviewed[0].totalReview
+      }
+  }
+
+   //useEffect to get hiragana data from imported function
+   useEffect(() => {
+    fetchTotalReviewed().then((data) => {
+      setTotalReviewed(data);
+    }).catch((err) => {
+      console.log(err);
+    }
+    );
+  }
+  , []);
+  
+  
+
     return (
         <div id='oc' className='buttons-deck'>
-          <h2>No cards currently queued for review!</h2>
+          <h2>{totalReviewed} cards are queued for review!</h2>
             {deckList.map((deck: Deck) => {
         return (
               <div className='cardDeck' key={deck.deck_id}> {/* Added key prop with a unique identifier */} 

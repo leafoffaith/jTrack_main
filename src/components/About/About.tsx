@@ -1,3 +1,7 @@
+/**
+ * @fileoverview About page for the application.
+ * @author Shaurya Dey s.dey2@ncl.ac.uk
+ */
 import Navbar from "../Navbar/Navbar";
 
 export const About = () => {
