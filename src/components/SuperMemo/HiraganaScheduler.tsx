@@ -6,6 +6,8 @@ import { FlashcardItem } from '../Flashcard/FlashcardItem';
 import { createHiraganaFlashcards } from '../Fetching/useHiraganaFetch';
 import Navbar from '../Navbar/Navbar';
 
+//i tried
+
 interface UpdatedFlashcard extends FlashcardItem {
   dueDate: string;
 }
@@ -13,7 +15,7 @@ interface UpdatedFlashcard extends FlashcardItem {
 const HiraganaScheduler = (): JSX.Element => {
 
   const [hiraganaData, setHiraganaData] = useState<[]>([]);
-  
+
   //practiced flashcards array
   const [practicedFlashcards, setPracticedFlashcards] = useState<UpdatedFlashcard[]>([]);
 
@@ -27,9 +29,9 @@ const HiraganaScheduler = (): JSX.Element => {
     }
     );
   }
-  , []);
+    , []);
 
- 
+
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
 
   /** 
@@ -51,7 +53,7 @@ const HiraganaScheduler = (): JSX.Element => {
     setPracticedFlashcards([...practicedFlashcards, updatedFlashcard]);
 
     // console.log(practicedFlashcards);
-   
+
     setCurrentCardIndex(currentCardIndex + 1);
 
     //once all practiced move to practiced flashcards to see if there are any due
@@ -89,17 +91,17 @@ const HiraganaScheduler = (): JSX.Element => {
   // Check if the current flashcard is due
   //  console.log(currentFlashcard)
   const isDue = currentFlashcard && isFlashcardDue(currentFlashcard.dueDate);
-  
+
   //pass down the state of the visiblity of the flashcard back component from here
   const [isFlipped, setIsFlipped] = useState(false);
 
   //reset isFlipped state to false when the current flashcard changes after a timeout of 3 seconds 
   useEffect(() => {
-     setIsFlipped(false);
+    setIsFlipped(false);
   }
-  , [currentFlashcard]);
+    , [currentFlashcard]);
 
-   return (
+  return (
     <div>
       <div className="header-navbar">
         <Navbar />
