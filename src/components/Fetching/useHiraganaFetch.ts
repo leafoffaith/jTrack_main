@@ -46,9 +46,9 @@ export const createHiraganaFlashcards = async () => {
     const flashcard: FlashcardItem = {
       front: hiraganaItem.front,
       back: hiraganaItem.back,
-      interval: hiraganaItem.interval ? hiraganaItem.interval : 0,
-      repetition: hiraganaItem.repetition ? hiraganaItem.repetition : 0,
-      efactor: hiraganaItem.eFactor ? hiraganaItem.eFactor : 0,
+      interval: hiraganaItem.interval ? hiraganaItem.interval : 1,
+      repetition: hiraganaItem.repetition ? hiraganaItem.repetition : 1,
+      efactor: hiraganaItem.eFactor ? hiraganaItem.eFactor : 2.5,
       dueDate: hiraganaItem.due_date
         ? hiraganaItem.due_date
         : dayjs().toISOString(),

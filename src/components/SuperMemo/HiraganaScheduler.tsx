@@ -53,6 +53,9 @@ const HiraganaScheduler = (): JSX.Element => {
 
     setCurrentCardIndex(currentCardIndex + 1);
 
+    //if you reach the END then data is set to the practiced
+    //flashcards and no more cards are shown cause none will be due
+    //in case any are due to eFactor or rep, they will be
     if (currentCardIndex === hiraganaData.length - 1) {
       setCurrentCardIndex(0);
       setHiraganaData(practicedFlashcards);

@@ -8,15 +8,16 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { supaClient } from '../Client/supaClient';
-interface Deck {  
-    deck_id: number;
-    title: string;
+import dayjs from 'dayjs';
+interface Deck {
+  deck_id: number;
+  title: string;
 }
 
 interface DeckSelectProps {
-    deckList: Deck[];
+  deckList: Deck[];
 }
-    
+
 
 
 /**
@@ -28,22 +29,23 @@ const DeckSelect: React.FC<DeckSelectProps> = ({ deckList }): JSX.Element => {
   const [totalReviewed, setTotalReviewed] = useState(0);
 
   const fetchTotalReviewed = async () => {
-    
-      const { data: reviewed, error } = await supaClient
-      .from('TotalReviewed')
-      .select('totalReview')
+
+    const { data: reviewed, error } = await supaClient
+      .from('hiragana, katakana')
+      .select('due_date')
+      .where('due_date', 'is', dayjs().toISOString())
       .then()
 
-      if(error){
-        console.log(error)
-      } else {
-        console.log(reviewed[0].totalReview)
-        return reviewed[0].totalReview
-      }
+    if (error) {
+      console.log(error)
+    } else {
+      console.log(reviewed[0].totalReview)
+      return reviewed[0].totalReview
+    }
   }
 
-   //useEffect to get hiragana data from imported function
-   useEffect(() => {
+  //useEffect to get hiragana data from imported function
+  useEffect(() => {
     fetchTotalReviewed().then((data) => {
       setTotalReviewed(data);
     }).catch((err) => {
@@ -51,26 +53,26 @@ const DeckSelect: React.FC<DeckSelectProps> = ({ deckList }): JSX.Element => {
     }
     );
   }
-  , []);
-  
-  
+    , []);
 
-    return (
-        <div id='oc' className='buttons-deck'>
-          <h2>{totalReviewed} cards are queued for review!</h2>
-            {deckList.map((deck: Deck) => {
+
+
+  return (
+    <div id='oc' className='buttons-deck'>
+      <h2>{totalReviewed} cards are queued for review!</h2>
+      {deckList.map((deck: Deck) => {
         return (
-              <div className='cardDeck' key={deck.deck_id}> {/* Added key prop with a unique identifier */} 
-                <h2>{deck.title}</h2>
-                <img src="/src/assets/1-2-kanji-tattoos-png-picture.png"/>
-                <Link to={`/learn/${deck.title.split(' ')[0].toLowerCase()}`}>
-                  <button>Start Learning</button>
-                </Link>
-              </div>
+          <div className='cardDeck' key={deck.deck_id}> {/* Added key prop with a unique identifier */}
+            <h2>{deck.title}</h2>
+            <img src="/src/assets/1-2-kanji-tattoos-png-picture.png" />
+            <Link to={`/learn/${deck.title.split(' ')[0].toLowerCase()}`}>
+              <button>Start Learning</button>
+            </Link>
+          </div>
         );
       })}
-        </div>
-    )
+    </div>
+  )
 }
 
 export default DeckSelect;

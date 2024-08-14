@@ -37,12 +37,15 @@ const KatakanaScheduler = (): JSX.Element => {
       console.log('Error updating flashcard:', error);
     }
 
-    const updatedFlashcards = [...katakanaData];
-    updatedFlashcards[currentCardIndex] = updatedFlashcard;
+    // const updatedFlashcards = [...katakanaData];
+    // updatedFlashcards[currentCardIndex] = updatedFlashcard;
 
     setPracticedFlashcards([...practicedFlashcards, updatedFlashcard]);
     setCurrentCardIndex(currentCardIndex + 1);
 
+    //if you reach the END then data is set to the practiced 
+    //flashcards and no more cards are shown cause none will be due
+    //in case any are due to eFactor or rep, they will be
     if (currentCardIndex === katakanaData.length - 1) {
       setCurrentCardIndex(0);
       setKatakanaData(practicedFlashcards);
@@ -63,6 +66,11 @@ const KatakanaScheduler = (): JSX.Element => {
 
   const currentFlashcard: FlashcardItem | undefined = katakanaData[currentCardIndex];
 
+  /**
+   * @TODO this needs to be simplified, because it's a timestamp it has to be either on or after tsz
+   * @param dueDate 
+   * @returns 
+   */
   const isFlashcardDue = (dueDate: string | undefined): boolean => {
     if (!dueDate) {
       return false;

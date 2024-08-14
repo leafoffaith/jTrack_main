@@ -42,9 +42,9 @@ export const createKatakanaFlashcards = async () => {
     const flashcard: FlashcardItem = {
       front: katakanaItem.front,
       back: katakanaItem.back,
-      interval: katakanaItem.interval ? katakanaItem.interval : 0,
-      repetition: katakanaItem.repetition ? katakanaItem.repetition : 0,
-      efactor: katakanaItem.eFactor ? katakanaItem.eFactor : 0,
+      interval: katakanaItem.interval ? katakanaItem.interval : 1,
+      repetition: katakanaItem.repetition ? katakanaItem.repetition : 1,
+      efactor: katakanaItem.eFactor ? katakanaItem.eFactor : 2.5,
       dueDate: katakanaItem.due_date
         ? katakanaItem.due_date
         : dayjs().toISOString(),
