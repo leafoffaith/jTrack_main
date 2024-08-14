@@ -3,7 +3,7 @@ import dayjs from 'dayjs';
 import { supermemo, SuperMemoGrade } from 'supermemo'
 import Flashcard from '../Flashcard/Flashcard';
 import { FlashcardItem } from '../Flashcard/FlashcardItem';
-import { createKatakanaFlashcards } from '../Fetching/useKatakanaFetch';
+import { createKatakanaFlashcards, updateKatakana } from '../Fetching/useKatakanaFetch';
 import Navbar from '../Navbar/Navbar';
 interface UpdatedFlashcard extends FlashcardItem {
   dueDate: string;
@@ -12,7 +12,7 @@ interface UpdatedFlashcard extends FlashcardItem {
 const KatakanaScheduler = (): JSX.Element => {
 
   const [katakanaData, setKatakanaData] = useState<[]>([]);
-  
+
   //practiced flashcards array
   const [practicedFlashcards, setPracticedFlashcards] = useState<UpdatedFlashcard[]>([]);
 
@@ -26,21 +26,29 @@ const KatakanaScheduler = (): JSX.Element => {
     }
     );
   }
-  , []);
+    , []);
 
- 
+
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
 
   /** 
    *  Pratice function logic that uses practiceFlashcard function
     @PARAM grade - the grade of the flashcard that is being practiced
   */
-  const practice = (grade: SuperMemoGrade): void => {
+  const practice = async (grade: SuperMemoGrade) => {
     const currentFlashcard = katakanaData[currentCardIndex];
 
     // Update the flashcard with the grade using the practiceFlashcard function
     const updatedFlashcard = practiceFlashcard(currentFlashcard, grade);
-    console.log(updatedFlashcard);
+
+    try {
+      await updateKatakana(updatedFlashcard);
+      console.log('Flashcard updated');
+    } catch (error) {
+      console.log('Error updating flashcard:', error);
+    }
+
+
     // Update the flashcard in your array or database with the updatedFlashcard data
     const updatedFlashcards = [...katakanaData];
     //replace the current flashcard with the updated flashcard
@@ -50,7 +58,7 @@ const KatakanaScheduler = (): JSX.Element => {
     setPracticedFlashcards([...practicedFlashcards, updatedFlashcard]);
 
     // console.log(practicedFlashcards);
-   
+
     setCurrentCardIndex(currentCardIndex + 1);
 
     //once all practiced move to practiced flashcards to see if there are any due
@@ -88,17 +96,17 @@ const KatakanaScheduler = (): JSX.Element => {
   // Check if the current flashcard is due
   //  console.log(currentFlashcard)
   const isDue = currentFlashcard && isFlashcardDue(currentFlashcard.dueDate);
-  
+
   //pass down the state of the visiblity of the flashcard back component from here
   const [isFlipped, setIsFlipped] = useState(false);
 
   //reset isFlipped state to false when the current flashcard changes after a timeout of 3 seconds 
   useEffect(() => {
-     setIsFlipped(false);
+    setIsFlipped(false);
   }
-  , [currentFlashcard]);
+    , [currentFlashcard]);
 
-   return (
+  return (
     <div>
       <div className="header-navbar">
         <Navbar />

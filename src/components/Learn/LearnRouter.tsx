@@ -9,6 +9,7 @@ export default function LearnRouter() {
             <Routes>
                 <Route path="/learn/hiragana" element={<div>hira</div>} />
                 <Route path="/learn/katakana" element={<div>kata</div>} />
+                <Route path="/learn/kanji" element={<div>kan</div>} />
             </Routes>
         </>
     )

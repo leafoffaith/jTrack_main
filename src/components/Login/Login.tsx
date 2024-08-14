@@ -1,9 +1,9 @@
-import { useState } from 'react';
+// import { useState } from 'react';
 import { supaClient } from '../Client/supaClient';
 import { Auth } from '@supabase/auth-ui-react';
 import {
   // Import predefined theme
-  ThemeSupa, ThemeMinimal,
+  ThemeSupa
 } from '@supabase/auth-ui-shared'
 
 export default function Login() {
@@ -12,21 +12,20 @@ export default function Login() {
 
   return (
     <div className="row flex flex-center">
-        <Auth
-            supabaseClient={supaClient}
-            appearance={{
-              theme: ThemeSupa,
-              variables: {
-                default: {
-                  colors: {
-                    brand: 'red',
-                    brandAccent: 'darkred',
-                  },
-                },
+      <Auth
+        supabaseClient={supaClient}
+        appearance={{
+          variables: {
+            default: {
+              colors: {
+                brand: 'red',
+                brandAccent: 'darkred',
               },
-            }}
-            providers={['github', 'google', 'facebook']}
-          />
+            },
+          },
+        }}
+        providers={['github', 'google']}
+      />
       {/* <Auth supabaseClient={supaClient} appearance={{ theme: ThemeSupa }} providers={['github']} /> */}
     </div>
   )

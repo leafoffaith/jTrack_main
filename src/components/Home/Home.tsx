@@ -18,15 +18,15 @@ const Home = () => {
             <div className="container" style={{ padding: '50px 0 100px 0' }}>
                 <Navbar />
             </div>
-            {/* Instructions for flashcard review */}
-            {/* <div>
+            Instructions for flashcard review
+            <div>
                 <h1 className="instructions">Instructions</h1>
                 <p className="instructions">1. Click on the "Learn" tab to select a new deck to learn.</p>
                 <p>2. Select your deck and which JLPT level you are comfortable with</p>
                 <p>3. For the multiple choice flashcards select the option you think is correct</p>
                 <p>6. For the flashcards with a kanji on the front, try and see if you can recall what the meaning of the Kanji is</p>
                 <p>Complete Hiragana and Katakana first before moving to other decks!</p>
-            </div> */}
+            </div>
             {/* Outlet for children to be rendered */}
             <Outlet />
 

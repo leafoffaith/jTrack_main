@@ -11,6 +11,10 @@ const Learn = () => {
 
 
     const getDecks = async () => {
+
+        console.log("supaClient:", supaClient);
+
+
         const { data: tempData, error } = await supaClient
             .from('decks')
             .select('title')
@@ -39,10 +43,11 @@ const Learn = () => {
             </div>
             {/* Render DeckSelect with fetched 'decks' */}
             <DeckSelect deckList={deckData} />
-            <Routes>
+            {/* <Routes>
                 <Route path="hiragana" element={<div>hiragana</div>} />
                 <Route path="katakana" element={<div>katakana</div>} />
-            </Routes>
+                <Route path="kanji" element={<div>kanji</div>} />
+            </Routes> */}
         </div>
     )
 }
