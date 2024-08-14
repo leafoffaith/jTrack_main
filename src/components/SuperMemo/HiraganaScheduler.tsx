@@ -44,12 +44,15 @@ const HiraganaScheduler = (): JSX.Element => {
       console.log('Error updating flashcard:', error);
     }
 
-    const updatedFlashcards = [...hiraganaData];
-    updatedFlashcards[currentCardIndex] = updatedFlashcard;
+    // const updatedFlashcards = [...hiraganaData];
+    // updatedFlashcards[currentCardIndex] = updatedFlashcard;
 
+    //can be used for 'you studied these cards this session' perhaps? don't see much use for this to be honest
+    //i could just re-run the fetch on every update
     setPracticedFlashcards([...practicedFlashcards, updatedFlashcard]);
 
     setCurrentCardIndex(currentCardIndex + 1);
+
     if (currentCardIndex === hiraganaData.length - 1) {
       setCurrentCardIndex(0);
       setHiraganaData(practicedFlashcards);
