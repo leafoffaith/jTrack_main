@@ -38,25 +38,25 @@ app.use(cors({
 app.get('/api/kuroshiro', async (req, res) => {
   const inputText = req.query.text; // Extract the 'text' query parameter from the request
   if (!inputText) {
-      return res.status(400).send("Missing 'text' query parameter.");
+    return res.status(400).send("Missing 'text' query parameter.");
   }
 
   const kuroshiro = new Kuroshiro();
   try {
-      await kuroshiro.init(new KuromojiAnalyzer());
-      const convertedText = await kuroshiro.convert(inputText, { to: "hiragana", mode: "furigana" });
-      
-      console.log(convertedText);
-      res.send(convertedText);
+    await kuroshiro.init(new KuromojiAnalyzer());
+    const convertedText = await kuroshiro.convert(inputText, { to: "hiragana", mode: "furigana" });
+
+    console.log(convertedText);
+    res.send(convertedText);
   } catch (err) {
-      console.error(err);
-      res.status(500).send("An error occurred while processing the request.");
+    console.error(err);
+    res.status(500).send("An error occurred while processing the request.");
   }
 });
 
 // Router
 app.get('/', (req, res) => {
-    res.send('Hello World!');
+  res.send('Hello World!');
 });
 
 // app.get('/getTSV', async (req, res) => {

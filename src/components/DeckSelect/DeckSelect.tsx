@@ -26,40 +26,40 @@ interface DeckSelectProps {
  */
 const DeckSelect: React.FC<DeckSelectProps> = ({ deckList }): JSX.Element => {
 
-  const [totalReviewed, setTotalReviewed] = useState(0);
+  // const [totalReviewed, setTotalReviewed] = useState(0);
 
-  const fetchTotalReviewed = async () => {
+  // const fetchTotalReviewed = async () => {
 
-    const { data: reviewed, error } = await supaClient
-      .from('hiragana, katakana')
-      .select('due_date')
-      .where('due_date', 'is', dayjs().toISOString())
-      .then()
+  //   const { data: reviewed, error } = await supaClient
+  //     .from('hiragana, katakana')
+  //     .select('due_date')
+  //     .where('due_date', 'is', dayjs().toISOString())
+  //     .then()
 
-    if (error) {
-      console.log(error)
-    } else {
-      console.log(reviewed[0].totalReview)
-      return reviewed[0].totalReview
-    }
-  }
+  //   if (error) {
+  //     console.log(error)
+  //   } else {
+  //     console.log(reviewed[0].totalReview)
+  //     return reviewed[0].totalReview
+  //   }
+  // }
 
   //useEffect to get hiragana data from imported function
-  useEffect(() => {
-    fetchTotalReviewed().then((data) => {
-      setTotalReviewed(data);
-    }).catch((err) => {
-      console.log(err);
-    }
-    );
-  }
-    , []);
+  // useEffect(() => {
+  //   fetchTotalReviewed().then((data) => {
+  //     setTotalReviewed(data);
+  //   }).catch((err) => {
+  //     console.log(err);
+  //   }
+  //   );
+  // }
+  //   , []);
 
 
 
   return (
     <div id='oc' className='buttons-deck'>
-      <h2>{totalReviewed} cards are queued for review!</h2>
+      {/* <h2>{totalReviewed} cards are queued for review!</h2> */}
       {deckList.map((deck: Deck) => {
         return (
           <div className='cardDeck' key={deck.deck_id}> {/* Added key prop with a unique identifier */}

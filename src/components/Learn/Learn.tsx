@@ -9,7 +9,6 @@ const Learn = () => {
     //state deckData
     const [deckData, setDeckData] = useState([]);
 
-
     const getDecks = async () => {
 
         console.log("supaClient:", supaClient);
@@ -28,12 +27,12 @@ const Learn = () => {
 
     useEffect(() => {
         getDecks().then(() => {
-            console.log(deckData)
+            console.log(deckData, "deck data")
         })
             .catch((error) => {
                 console.log(error)
             })
-    }, [])
+    }, [deckData])
 
 
     return (
