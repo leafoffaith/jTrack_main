@@ -10,7 +10,7 @@ const fetchHiragana = async () => {
   if (error) {
     console.warn(error);
   } else if (hiragana) {
-    //   console.log('hiragana', hiragana)
+    console.log("hiragana", hiragana);
     return hiragana;
   }
 };
@@ -44,8 +44,8 @@ export const createHiraganaFlashcards = async () => {
   hiragana.forEach((hiraganaItem: any) => {
     console.log(hiraganaItem);
     const flashcard: FlashcardItem = {
-      front: hiraganaItem.front,
-      back: hiraganaItem.back,
+      front: hiraganaItem.hiragana,
+      back: hiraganaItem.romaji,
       interval: hiraganaItem.interval ? hiraganaItem.interval : 1,
       repetition: hiraganaItem.repetition ? hiraganaItem.repetition : 1,
       efactor: hiraganaItem.eFactor ? hiraganaItem.eFactor : 2.5,

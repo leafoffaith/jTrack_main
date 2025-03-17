@@ -16,7 +16,7 @@ const Learn = () => {
 
         const { data: tempData, error } = await supaClient
             .from('decks')
-            .select('title')
+            .select('*')
         if (error) {
             console.warn(error)
         } else if (tempData) {
@@ -42,11 +42,11 @@ const Learn = () => {
             </div>
             {/* Render DeckSelect with fetched 'decks' */}
             <DeckSelect deckList={deckData} />
-            {/* <Routes>
+            <Routes>
                 <Route path="hiragana" element={<div>hiragana</div>} />
                 <Route path="katakana" element={<div>katakana</div>} />
                 <Route path="kanji" element={<div>kanji</div>} />
-            </Routes> */}
+            </Routes>
         </div>
     )
 }

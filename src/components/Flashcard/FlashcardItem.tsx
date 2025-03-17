@@ -12,5 +12,5 @@ export interface FlashcardItem extends SuperMemoItem {
   }
   options?: []
   dueDate?: string;
-  key? : any;
+  _userID?: number;
 }

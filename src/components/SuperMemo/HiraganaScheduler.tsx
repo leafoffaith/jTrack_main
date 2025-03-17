@@ -21,9 +21,7 @@ const HiraganaScheduler = (): JSX.Element => {
     createHiraganaFlashcards()
       .then((data) => {
         console.log(data);
-        /**
-         * @TODO This should be updated to database
-         */
+
         setHiraganaData(data);
       })
       .catch((err) => {
