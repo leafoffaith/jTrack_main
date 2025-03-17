@@ -18,6 +18,7 @@ const HiraganaScheduler = (): JSX.Element => {
 
 
   useEffect(() => {
+    //Setting hiragana data here
     createHiraganaFlashcards()
       .then((data) => {
         console.log(data);
