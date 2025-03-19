@@ -2,6 +2,7 @@ import { supaClient } from "../Client/supaClient";
 import { FlashcardItem } from "../Flashcard/FlashcardItem";
 import dayjs from "dayjs";
 
+//Fetching new Hiragana
 const fetchHiragana = async () => {
   const { data: hiragana, error } = await supaClient
     .from("hiragana")
@@ -13,6 +14,27 @@ const fetchHiragana = async () => {
     console.log("hiragana", hiragana);
     return hiragana;
   }
+};
+
+//Fetching studied hiragana flashcards
+const fetchUserHiragana = async (userId: number) => {
+  const { data: d, error } = await supaClient
+    .from("studied_flashcards")
+    .select("*")
+    .eq("user_id", userId);
+
+  if (error) {
+    console.error("Error fetching data: ", error);
+  }
+
+  return d;
+};
+
+const fetchAvailableHiragana = async (userId: number) => {
+  const studiedFlashcards = await fetchUserHiragana(userId);
+  const hiragana = await fetchHiragana();
+
+  const studiedFronts = studiedFlashcards?.map(card =>)
 };
 
 export const updateFlashcard = async (flashcard: FlashcardItem) => {

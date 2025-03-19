@@ -18,6 +18,11 @@ const HiraganaScheduler = (): JSX.Element => {
 
 
   useEffect(() => {
+
+    //create hiragana flashcards for the current user
+    //given the current user id, get the flashcards from the studied flashcards corresponding to the current user
+    //get the characters that are in the new flashcards but not in studied flashcards
+
     //Setting hiragana data here
     createHiraganaFlashcards()
       .then((data) => {
