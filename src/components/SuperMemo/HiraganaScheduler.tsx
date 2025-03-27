@@ -3,10 +3,21 @@ import dayjs from 'dayjs';
 import { supermemo, SuperMemoGrade } from 'supermemo';
 import Flashcard from '../Flashcard/Flashcard';
 import { FlashcardItem } from '../Flashcard/FlashcardItem';
-import { createHiraganaFlashcards, updateFlashcard } from '../Fetching/useHiraganaFetch';
+import { fetchAvailableHiragana, updateFlashcard } from '../Fetching/useHiraganaFetch';
 import Navbar from '../Navbar/Navbar';
+import { supaClient } from '../Client/supaClient';
 
 interface UpdatedFlashcard extends FlashcardItem {
+  dueDate: string;
+}
+
+interface StudiedFlashcardData {
+  user_id: number;
+  front: string;
+  back: string;
+  interval: number;
+  repetition: number;
+  efactor: number;
   dueDate: string;
 }
 
@@ -15,54 +26,74 @@ const HiraganaScheduler = (): JSX.Element => {
   const [practicedFlashcards, setPracticedFlashcards] = useState<UpdatedFlashcard[]>([]);
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
-
+  const [userId, setUserId] = useState<number>(1); // TODO: Get actual user ID from auth
 
   useEffect(() => {
-
-    //create hiragana flashcards for the current user
-    //given the current user id, get the flashcards from the studied flashcards corresponding to the current user
-    //get the characters that are in the new flashcards but not in studied flashcards
-
-    //Setting hiragana data here
-    createHiraganaFlashcards()
-      .then((data) => {
-        console.log(data);
-
+    // Fetch available flashcards (both studied and new)
+    const fetchFlashcards = async (): Promise<void> => {
+      try {
+        const data = await fetchAvailableHiragana(userId);
+        console.log("Available flashcards:", data);
         setHiraganaData(data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, []);
+      } catch (err) {
+        console.error("Error fetching flashcards:", err);
+      }
+    };
+
+    void fetchFlashcards();
+  }, [userId]);
 
   const practice = async (grade: SuperMemoGrade): Promise<void> => {
     const currentFlashcard = hiraganaData[currentCardIndex];
+    if (!currentFlashcard) return;
 
     const updatedFlashcard = practiceFlashcard(currentFlashcard, grade);
-    console.log(updatedFlashcard);
+    console.log("Updated flashcard:", updatedFlashcard);
 
     try {
+      // Update the flashcard in the hiragana table
       await updateFlashcard(updatedFlashcard);
-      console.log('Flashcard updated');
+
+      // Add or update the flashcard in studied_flashcards table
+      const studiedData: StudiedFlashcardData = {
+        user_id: userId,
+        front: updatedFlashcard.front,
+        back: updatedFlashcard.back || '', // Ensure back is never undefined
+        interval: updatedFlashcard.interval,
+        repetition: updatedFlashcard.repetition,
+        efactor: updatedFlashcard.efactor,
+        dueDate: updatedFlashcard.dueDate
+      };
+
+      const { error: studiedError } = await supaClient
+        .from('studied_flashcards')
+        .upsert(studiedData);
+
+      if (studiedError) {
+        console.error('Error updating studied flashcard:', studiedError);
+      }
+
+      console.log('Flashcard updated successfully');
     } catch (error) {
-      console.log('Error updating flashcard:', error);
+      console.error('Error updating flashcard:', error);
     }
 
-    // const updatedFlashcards = [...hiraganaData];
-    // updatedFlashcards[currentCardIndex] = updatedFlashcard;
-
-    //can be used for 'you studied these cards this session' perhaps? don't see much use for this to be honest
-    //i could just re-run the fetch on every update
     setPracticedFlashcards([...practicedFlashcards, updatedFlashcard]);
-
     setCurrentCardIndex(currentCardIndex + 1);
 
-    //if you reach the END then data is set to the practiced
-    //flashcards and no more cards are shown cause none will be due
-    //in case any are due to eFactor or rep, they will be
+    // If we've gone through all cards, fetch new ones
     if (currentCardIndex === hiraganaData.length - 1) {
       setCurrentCardIndex(0);
-      setHiraganaData(practicedFlashcards);
+      const fetchNewFlashcards = async (): Promise<void> => {
+        try {
+          const newData = await fetchAvailableHiragana(userId);
+          setHiraganaData(newData);
+        } catch (err) {
+          console.error("Error fetching new flashcards:", err);
+        }
+      };
+
+      void fetchNewFlashcards();
     }
   };
 
@@ -86,14 +117,14 @@ const HiraganaScheduler = (): JSX.Element => {
     }
     const currentDate = dayjs();
     const flashcardDueDate = dayjs(dueDate);
-    return flashcardDueDate.isSame(currentDate, 'day');
+    return flashcardDueDate.isSame(currentDate, 'day') || flashcardDueDate.isBefore(currentDate);
   };
 
   const isDue = currentFlashcard && isFlashcardDue(currentFlashcard.dueDate);
 
   useEffect(() => {
     setIsFlipped(false);
-  }, [currentFlashcard]);
+  }, [currentCardIndex]);
 
   return (
     <div>
@@ -107,7 +138,9 @@ const HiraganaScheduler = (): JSX.Element => {
             back={currentFlashcard.back}
             flipped={isFlipped}
             setIsFlipped={setIsFlipped}
-            practice={practice}
+            practice={(grade: SuperMemoGrade) => {
+              void practice(grade);
+            }}
           />
         </div>
       ) : (
