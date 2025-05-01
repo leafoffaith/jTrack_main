@@ -56,21 +56,14 @@ const Navbar = () => {
     }
   }
 
-  //dropdown state
-  //handle logout
-  async function signOut() {
-    const { error } = await supaClient.auth.signOut()
-
+  const signOut = async () => {
+    const { error } = await supaClient.auth.signOut();
     if (error) {
-      console.log('Error signing out:', error.message)
-    } else {
-      console.log('Signed out successfully')
+      console.error('Error signing out:', error.message);
     }
-
-  }
+  };
 
   return (
-
     <>
       <div id="oc" className="navbar">
         <div className="navbar__left">
@@ -97,7 +90,7 @@ const Navbar = () => {
             </span> */}
         <span className="navbar__right__item input-container">
           {/* <input id="Search" type="text" placeholder="Search for Kanji, Sentences and more" className="input-field" /> */}
-          <button onClick={signOut}>Sign Out</button>
+          <button onClick={() => void signOut()}>Sign Out</button>
         </span>
       </div>
     </>

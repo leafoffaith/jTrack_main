@@ -131,23 +131,25 @@ const HiraganaScheduler = (): JSX.Element => {
       <div className="header-navbar">
         <Navbar />
       </div>
-      {currentFlashcard && isDue ? (
-        <div>
-          <Flashcard
-            front={currentFlashcard.front}
-            back={currentFlashcard.back}
-            flipped={isFlipped}
-            setIsFlipped={setIsFlipped}
-            practice={(grade: SuperMemoGrade) => {
-              void practice(grade);
-            }}
-          />
-        </div>
-      ) : (
-        <div>
-          <h3>No flashcards due</h3>
-        </div>
-      )}
+      <div className="main-content">
+        {currentFlashcard && isDue ? (
+          <div>
+            <Flashcard
+              front={currentFlashcard.front}
+              back={currentFlashcard.back}
+              flipped={isFlipped}
+              setIsFlipped={setIsFlipped}
+              practice={(grade: SuperMemoGrade) => {
+                void practice(grade);
+              }}
+            />
+          </div>
+        ) : (
+          <div>
+            <h3>No flashcards due</h3>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

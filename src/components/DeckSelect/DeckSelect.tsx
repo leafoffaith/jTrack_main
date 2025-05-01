@@ -18,17 +18,14 @@ interface DeckSelectProps {
   deckList: Deck[];
 }
 
-
 /**
  * 
  * @returns deck selection page
  */
 const DeckSelect: React.FC<DeckSelectProps> = ({ deckList }): JSX.Element => {
-
   const [totalReviewed, setTotalReviewed] = useState(0);
 
   const fetchTotalReviewed = async () => {
-
     const { data: reviewed, error } = await supaClient
       .from('hiragana, katakana')
       .select('due_date')
@@ -43,27 +40,21 @@ const DeckSelect: React.FC<DeckSelectProps> = ({ deckList }): JSX.Element => {
     }
   }
 
-  // useEffect to get hiragana data from imported function
   useEffect(() => {
     fetchTotalReviewed().then((data) => {
       setTotalReviewed(data);
     }).catch((err) => {
       console.log(err);
-    }
-    );
-  }
-    , []);
-
-
+    });
+  }, []);
 
   return (
     <div id='oc' className='buttons-deck'>
       {/* <h2>{totalReviewed} cards are queued for review!</h2> */}
       {deckList.map((deck: Deck) => {
         return (
-          <div className='cardDeck' key={deck.deck_id}> {/* Added key prop with a unique identifier */}
-            <h2>{deck.title}</h2>
-            <img src="/src/assets/1-2-kanji-tattoos-png-picture.png" />
+          <div className='cardDeck' key={deck.deck_id}>
+            <h2>{deck.title.toUpperCase()}</h2>
             <Link to={`/learn/${deck.title.split(' ')[0].toLowerCase()}`}>
               <button>Start Learning</button>
             </Link>

@@ -13,12 +13,19 @@
 
 /* Media query for responsiveness */
 @media screen and (max-width: 800px) {
-  #noDis, .navbar__right__item {
-    float: none; /* Remove float */
-    display: none; /* Display links vertically */
-    text-align: left; /* Align text to the left */
-    padding: 10px; /* Reduce padding for smaller screens */
-    font-size: 16px; /* Adjust font size */
+
+  #noDis,
+  .navbar__right__item {
+    float: none;
+    /* Remove float */
+    display: none;
+    /* Display links vertically */
+    text-align: left;
+    /* Align text to the left */
+    padding: 10px;
+    /* Reduce padding for smaller screens */
+    font-size: 16px;
+    /* Adjust font size */
   }
 
   #oc {
@@ -30,9 +37,9 @@
   }
 }
 
- menuitem {
-    display: none;
- }
+menuitem {
+  display: none;
+}
 
 /* Style the links inside the navbar */
 .navbar a {
@@ -42,11 +49,16 @@
   padding: 14px 16px;
   text-decoration: none;
   font-size: 17px;
+  transition: all 0.2s ease;
 }
 
 /* Change color on hover */
 .navbar a:hover {
   background-color: #222;
+  color: white;
+}
+
+.navbar a:hover span {
   color: white;
 }
 
@@ -65,7 +77,8 @@
 
 /* Style the input field inside the navbar */
 .navbar .input-field {
-  width: 300px; /* Full-width */
+  width: 300px;
+  /* Full-width */
   /* Rounded borders */
   border: 2px solid #444;
   border-radius: 10px;
