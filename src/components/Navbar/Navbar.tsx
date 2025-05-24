@@ -35,7 +35,7 @@ const Navbar = () => {
     },
     bmMenu: {
       background: '#373a47',
-      padding: '2.5em 1.5em 0',
+      padding: '2.5em 0 0 0',
       fontSize: '1.15em'
     },
     bmMorphShape: {
@@ -43,13 +43,22 @@ const Navbar = () => {
     },
     bmItemList: {
       color: '#b8b7ad',
-      padding: '0.8em'
+      padding: '0',
+      display: 'flex',
+      flexDirection: 'column',
     },
     bmItem: {
       color: 'white',
-      display: 'flex',
-      flexDirection: 'row',
-
+      display: 'block',
+      textAlign: 'left',
+      padding: '1rem 1.5rem',
+      textDecoration: 'none',
+      fontSize: '1.2rem',
+      width: '100%',
+      transition: 'background-color 0.2s ease',
+      '&:hover': {
+        backgroundColor: '#4a4d5c'
+      }
     },
     bmOverlay: {
       background: 'rgba(0, 0, 0, 0.3)'
@@ -72,6 +81,8 @@ const Navbar = () => {
               <a href="/">Home</a>
               <a href="/learn">Learn</a>
               <a href="/leaderboard">Leaderboard</a>
+              <a href="/profile">Profile</a>
+              <a href="/awards">Achievements</a>
             </Menu>
           </div>
           {/* <Link to="/" className="link">

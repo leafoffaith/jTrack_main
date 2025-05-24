@@ -7,20 +7,20 @@ export const menuItems = [
     title: "Learn",
     url: "/learn",
   },
-  // {
-  //   title: 'Login',
-  //   url: '/Login',
-  // },
-  // {
-  //   title: 'Leaderboard',
-  //   url: '/leaderboard',
-  // },
-  // {
-  //   title: 'Profile',
-  //   url: '/profile',
-  // },
-  // {
-  //   title: 'Achievements',
-  //   url: '/awards',
-  // },
+  {
+    title: "Login",
+    url: "/login",
+  },
+  {
+    title: "Leaderboard",
+    url: "/leaderboard",
+  },
+  {
+    title: "Profile",
+    url: "/profile",
+  },
+  {
+    title: "Achievements",
+    url: "/awards",
+  },
 ];

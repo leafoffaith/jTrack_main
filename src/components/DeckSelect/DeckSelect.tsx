@@ -56,7 +56,7 @@ const DeckSelect: React.FC<DeckSelectProps> = ({ deckList }): JSX.Element => {
           <div className='cardDeck' key={deck.deck_id}>
             <h2>{deck.title.toUpperCase()}</h2>
             <Link to={`/learn/${deck.title.split(' ')[0].toLowerCase()}`}>
-              <button>Start Learning</button>
+              <button>START LEARNING</button>
             </Link>
           </div>
         );

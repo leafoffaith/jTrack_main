@@ -36,12 +36,13 @@ const Learn = () => {
 
 
     return (
-        <div>
+        <div style={{ width: '100%', maxWidth: '100%', overflow: 'hidden' }}>
             <div className="header-navbar">
                 <Navbar />
             </div>
-            {/* Render DeckSelect with fetched 'decks' */}
-            <DeckSelect deckList={deckData} />
+            <div style={{ width: '100%', padding: '0 1rem' }}>
+                <DeckSelect deckList={deckData} />
+            </div>
             <Routes>
                 <Route path="hiragana" element={<div>hiragana</div>} />
                 <Route path="katakana" element={<div>katakana</div>} />
