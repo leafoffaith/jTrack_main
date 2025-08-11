@@ -66,7 +66,7 @@ const HiraganaScheduler = (): JSX.Element => {
       };
 
       const { error: studiedError } = await supaClient
-        .from('studiedFlashcard')
+        .from('studied_flashcards')
         .upsert(studiedData);
 
       if (studiedError) {
@@ -133,7 +133,7 @@ const HiraganaScheduler = (): JSX.Element => {
         <Navbar />
       </div>
       <div className="main-content">
-        {currentFlashcard && isDue ? (
+        {currentFlashcard || isDue ? (
           <div>
             <Flashcard
               front={currentFlashcard.front}

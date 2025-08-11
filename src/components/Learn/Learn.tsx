@@ -2,14 +2,14 @@ import DeckSelect from "../DeckSelect/DeckSelect";
 import Navbar from "../Navbar/Navbar";
 import { supaClient } from "../Client/supaClient";
 import { useEffect, useState } from "react";
-import { Outlet, Route, Routes } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 
 const Learn = () => {
 
     //state deckData
-    const [deckData, setDeckData] = useState([]);
+    const [deckData, setDeckData] = useState<any[]>([]);
 
-    const getDecks = async () => {
+    const getDecks = async (): Promise<void> => {
 
         console.log("supaClient:", supaClient);
 
@@ -19,20 +19,19 @@ const Learn = () => {
             .select('*')
         if (error) {
             console.warn(error)
-        } else if (tempData) {
-            console.log(tempData)
+            return;
+        }
+        if (tempData) {
             setDeckData(tempData);
+            console.log(tempData, "deck data");
         }
     }
 
     useEffect(() => {
-        getDecks().then(() => {
-            console.log(deckData, "deck data")
+        getDecks().catch((error) => {
+            console.log(error)
         })
-            .catch((error) => {
-                console.log(error)
-            })
-    }, [deckData])
+    }, [])
 
 
     return (

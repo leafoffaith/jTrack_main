@@ -27,9 +27,8 @@ const DeckSelect: React.FC<DeckSelectProps> = ({ deckList }): JSX.Element => {
 
   const fetchTotalReviewed = async () => {
     const { data: reviewed, error } = await supaClient
-      .from('hiragana, katakana')
+      .from('studied_flashcards')
       .select('due_date')
-      .where('due_date', 'is', dayjs().toISOString())
       .then()
 
     if (error) {
@@ -49,7 +48,7 @@ const DeckSelect: React.FC<DeckSelectProps> = ({ deckList }): JSX.Element => {
   }, []);
 
   return (
-    <div id='oc' className='buttons-deck'>
+    <div id='oc' className='buttons-deck' key={totalReviewed}>
       {/* <h2>{totalReviewed} cards are queued for review!</h2> */}
       {deckList.map((deck: Deck) => {
         return (
