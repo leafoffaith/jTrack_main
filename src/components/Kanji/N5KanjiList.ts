@@ -2,10 +2,6 @@ import { useKanjifetch } from "../Fetching/useKanjiFetch"
 import { FlashcardItem } from "../Flashcard/FlashcardItem"
 import dayjs from "dayjs"
 
-import JishoAPI from 'unofficial-jisho-api';
-
-const jisho = new JishoAPI();
-
 const n5kanjiList = [
 '日',
 '週',
@@ -137,7 +133,7 @@ export const fetchKanjiByLevel = async (level: string) => {
             interval: 0,
             repetition: 0,
             efactor: 2.5,
-            dueDate: dayjs().toISOString(),
+            due_date: dayjs().toISOString(),
             };
         results.push(flashcard);
       }

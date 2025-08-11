@@ -2,7 +2,7 @@ import { FlashcardItem } from "../Flashcard/FlashcardItem";
 import dayjs from "dayjs";
 
 interface datedFlashcard extends FlashcardItem {
-    dueDate: string;
+    due_date: string;
 }
 
 //dueDate can be received as dayjs().toISOString()
