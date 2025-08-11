@@ -7,7 +7,7 @@ import { createSentenceFlashcards, createMultipleChoiceOptions } from '../JMDict
 import Navbar from '../Navbar/Navbar';
 
 interface UpdatedFlashcard extends FlashcardItem {
-  dueDate: string;
+  due_date: string;
 }
 //Start of Scheduler component
 const SentenceScheduler = (): JSX.Element => {
@@ -84,32 +84,32 @@ const SentenceScheduler = (): JSX.Element => {
 
   const practiceFlashcard = (flashcard: FlashcardItem, grade: SuperMemoGrade): UpdatedFlashcard => {
     const { interval, repetition, efactor } = supermemo(flashcard, grade);
-    const dueDate = dayjs().add(interval, 'day').toISOString();
+    const due_date = dayjs().add(interval, 'day').toISOString();
     return {
       ...flashcard,
       interval,
       repetition,
       efactor,
-      dueDate,
+      due_date,
     };
   };
 
   //removed | undefined from the currentFlashcard type so that undefined types are never pushed
   const currentFlashcard: FlashcardItem = sentenceData[currentCardIndex];
 
-  const isFlashcardDue = (dueDate: string | undefined): boolean => {
-    if (!dueDate) {
+  const isFlashcardDue = (due_date: string | undefined): boolean => {
+    if (!due_date) {
       return false;
     }
     const currentDate = dayjs();
-    const flashcardDueDate = dayjs(dueDate);
+    const flashcardDueDate = dayjs(due_date);
     console.log(flashcardDueDate.isSame(currentDate, 'day'))
     return flashcardDueDate.isSame(currentDate, 'day');
   };
 
   // Check if the current flashcard is due
   //  console.log(currentFlashcard)
-  const isDue = currentFlashcard && isFlashcardDue(currentFlashcard.dueDate);
+  const isDue = currentFlashcard && isFlashcardDue(currentFlashcard.due_date);
   
 
 

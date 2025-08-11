@@ -11,6 +11,6 @@ export interface FlashcardItem extends SuperMemoItem {
     stroke_count: number
   }
   options?: []
-  dueDate?: string;
+  due_date?: string;
   _userID?: number;
 }

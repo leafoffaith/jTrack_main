@@ -8,7 +8,7 @@ import Navbar from '../Navbar/Navbar';
 import { supaClient } from '../Client/supaClient';
 
 interface UpdatedFlashcard extends FlashcardItem {
-  dueDate: string;
+  due_date: string;
 }
 
 interface StudiedFlashcardData {
@@ -18,7 +18,7 @@ interface StudiedFlashcardData {
   interval: number;
   repetition: number;
   efactor: number;
-  dueDate: string;
+  due_date: string;
 }
 
 const HiraganaScheduler = (): JSX.Element => {
@@ -54,7 +54,7 @@ const HiraganaScheduler = (): JSX.Element => {
       // Update the flashcard in the hiragana table
       await updateFlashcard(updatedFlashcard);
 
-      // Add or update the flashcard in studied_flashcards table
+      // Add or update the flashcard in studiedFlashcard table
       const studiedData: StudiedFlashcardData = {
         user_id: userId,
         front: updatedFlashcard.front,
@@ -62,18 +62,19 @@ const HiraganaScheduler = (): JSX.Element => {
         interval: updatedFlashcard.interval,
         repetition: updatedFlashcard.repetition,
         efactor: updatedFlashcard.efactor,
-        dueDate: updatedFlashcard.dueDate
+        due_date: updatedFlashcard.due_date
       };
 
       const { error: studiedError } = await supaClient
-        .from('studied_flashcards')
+        .from('studiedFlashcard')
         .upsert(studiedData);
 
       if (studiedError) {
         console.error('Error updating studied flashcard:', studiedError);
+      } else {
+        console.log('Flashcard updated successfully in studiedFashcard table');
       }
 
-      console.log('Flashcard updated successfully');
     } catch (error) {
       console.error('Error updating flashcard:', error);
     }
@@ -99,28 +100,28 @@ const HiraganaScheduler = (): JSX.Element => {
 
   const practiceFlashcard = (flashcard: FlashcardItem, grade: SuperMemoGrade): UpdatedFlashcard => {
     const { interval, repetition, efactor } = supermemo(flashcard, grade);
-    const dueDate = dayjs().add(interval, 'day').toISOString();
+    const due_date = dayjs().add(interval, 'day').toISOString();
     return {
       ...flashcard,
       interval,
       repetition,
       efactor,
-      dueDate,
+      due_date,
     };
   };
 
   const currentFlashcard: FlashcardItem | undefined = hiraganaData[currentCardIndex];
 
-  const isFlashcardDue = (dueDate: string | undefined): boolean => {
-    if (!dueDate) {
+  const isFlashcardDue = (due_date: string | undefined): boolean => {
+    if (!due_date) {
       return false;
     }
     const currentDate = dayjs();
-    const flashcardDueDate = dayjs(dueDate);
+    const flashcardDueDate = dayjs(due_date);
     return flashcardDueDate.isSame(currentDate, 'day') || flashcardDueDate.isBefore(currentDate);
   };
 
-  const isDue = currentFlashcard && isFlashcardDue(currentFlashcard.dueDate);
+  const isDue = currentFlashcard && isFlashcardDue(currentFlashcard.due_date);
 
   useEffect(() => {
     setIsFlipped(false);

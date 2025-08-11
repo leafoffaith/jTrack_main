@@ -7,7 +7,7 @@ import { createKatakanaFlashcards, updateKatakana } from '../Fetching/useKatakan
 import Navbar from '../Navbar/Navbar';
 
 interface UpdatedFlashcard extends FlashcardItem {
-  dueDate: string;
+  due_date: string;
 }
 
 const KatakanaScheduler = (): JSX.Element => {
@@ -54,13 +54,13 @@ const KatakanaScheduler = (): JSX.Element => {
 
   const practiceFlashcard = (flashcard: FlashcardItem, grade: SuperMemoGrade): UpdatedFlashcard => {
     const { interval, repetition, efactor } = supermemo(flashcard, grade);
-    const dueDate = dayjs().add(interval, 'day').toISOString();
+    const due_date = dayjs().add(interval, 'day').toISOString();
     return {
       ...flashcard,
       interval,
       repetition,
       efactor,
-      dueDate,
+      due_date,
     };
   };
 
@@ -68,19 +68,19 @@ const KatakanaScheduler = (): JSX.Element => {
 
   /**
    * @TODO this needs to be simplified, because it's a timestamp it has to be either on or after tsz
-   * @param dueDate 
+   * @param due_date 
    * @returns 
    */
-  const isFlashcardDue = (dueDate: string | undefined): boolean => {
-    if (!dueDate) {
+  const isFlashcardDue = (due_date: string | undefined): boolean => {
+    if (!due_date) {
       return false;
     }
     const currentDate = dayjs();
-    const flashcardDueDate = dayjs(dueDate);
+    const flashcardDueDate = dayjs(due_date);
     return flashcardDueDate.isSame(currentDate, 'day');
   };
 
-  const isDue = currentFlashcard && isFlashcardDue(currentFlashcard.dueDate);
+  const isDue = currentFlashcard && isFlashcardDue(currentFlashcard.due_date);
 
   useEffect(() => {
     setIsFlipped(false);
