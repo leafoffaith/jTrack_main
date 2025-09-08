@@ -2,13 +2,21 @@
 import { supaClient } from '../Client/supaClient';
 import { Auth } from '@supabase/auth-ui-react';
 import Navbar from '../Navbar/Navbar';
+import { signUp, signIn } from './loginLogic';
 // import './Login.css';
 
 export default function Login() {
+
+  const [email, setEmail] = ('' as unknown) as [string, (email: string) => void];
+  const [password, setPassword] = ('' as unknown) as [string, (password: string) => void];
+
+  const handleLogin = signIn
+  const handleSignUp = signUp
+
   return (
     <div>
       <Navbar />
-      <div style={{
+      {/* <div style={{
         marginTop: '120px',
         marginLeft: 'auto',
         marginRight: 'auto',
@@ -52,6 +60,24 @@ export default function Login() {
           }}
           providers={['github', 'google']}
         />
+      </div> */}
+
+      <div>
+        <h2>Login</h2>
+        {/* create inputs */}
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        <button onClick={handleLogin}>Login</button>
       </div>
     </div>
   )
