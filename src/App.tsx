@@ -1,11 +1,39 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import './App.css';
 import { supaClient } from './components/Client/supaClient';
 import { Session } from '@supabase/supabase-js';
 
+const LOCAL_SESSION_KEY = 'sb_minimal_session_v1';
+
 function App() {
   const [session, setSession] = useState<Session | null>(null);
+  const expiryTimerRef = useRef<number | null>(null);
+  const subRef = useRef<any>(null);
+
+  //helper: persist minimal session to avoid storing raw access/refresh tokens
+  const persistMinimalSession = (s: Session | null) => {
+    if (!s) {
+      localStorage.removeItem(LOCAL_SESSION_KEY);
+      return;
+    }
+    const minimal = {
+      userId: s.user?.id,
+      expieres_at: s.expires_at ?? null,
+    };
+    localStorage.setItem(LOCAL_SESSION_KEY, JSON.stringify(minimal))
+  }
+
+  //clear timer
+  const clearTimer = () => {
+    if (expiryTimerRef.current != null) {
+      window.clearTimeout(expiryTimerRef.current);
+      expiryTimerRef.current = null;
+    }
+  }
+
+  //schedule expiry handler
+
 
   useEffect(() => {
     console.log("useEffect is running");
@@ -39,7 +67,6 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       {/* Your app content */}
-
 
     </QueryClientProvider>
   );

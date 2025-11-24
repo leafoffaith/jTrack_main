@@ -3,82 +3,65 @@ import { supaClient } from '../Client/supaClient';
 import { Auth } from '@supabase/auth-ui-react';
 import Navbar from '../Navbar/Navbar';
 import { signUp, signIn } from './loginLogic';
+import { useState } from 'react';
 // import './Login.css';
 
 export default function Login() {
 
-  const [email, setEmail] = ('' as unknown) as [string, (email: string) => void];
-  const [password, setPassword] = ('' as unknown) as [string, (password: string) => void];
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
-  const handleLogin = signIn
-  const handleSignUp = signUp
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+
+    // const handleLogin = 
+    const handleLogin = async () => {
+      const { data, error } = await signIn(email, password);
+      console.log(email, password);
+      if (error) {
+        console.error('Error signing in:', error.message);
+      } else {
+        console.log('User signed in:', data.user);
+        console.log(data);
+        return data;
+      }
+    }
+    handleLogin()
+      .then(() => {
+        // window.location.href = '/learn';
+        alert('Login successful!');
+        // save user session access token from data to cache and set timeout to clear it after 1 hour
+
+      }).catch((error) => {
+        console.error('Login failed:', error);
+      });
+  }
+  // const handleSignUp = signUp
 
   return (
     <div>
       <Navbar />
-      {/* <div style={{
-        marginTop: '120px',
-        marginLeft: 'auto',
-        marginRight: 'auto',
-        backgroundColor: '#f9e9de',
-        padding: '1.5rem',
-        borderRadius: '8px',
-        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-        width: '100%',
-        maxWidth: '350px',
-      }}>
-        <Auth
-          supabaseClient={supaClient}
-          appearance={{
-            variables: {
-              default: {
-                colors: {
-                  brand: '#3e5172',
-                  brandAccent: '#cc6c5c',
-                },
-              },
-            },
-            style: {
-              button: {
-                backgroundColor: '#3e5172',
-                color: 'white',
-                borderRadius: '4px',
-                padding: '0.5rem 1rem',
-              },
-              input: {
-                backgroundColor: 'white',
-                borderRadius: '4px',
-                border: '1px solid #3e5172',
-                padding: '0.75rem',
-                fontSize: '1rem',
-              },
-              label: {
-                // color: '#3e5172',
-                opacity: 0.7,
-              },
-            },
-          }}
-          providers={['github', 'google']}
-        />
-      </div> */}
-
       <div>
         <h2>Login</h2>
         {/* create inputs */}
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <button onClick={handleLogin}>Login</button>
+        <form onSubmit={handleSubmit}>
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          <button type="submit">Log In</button>
+        </form>
       </div>
-    </div>
+    </div >
   )
 }
