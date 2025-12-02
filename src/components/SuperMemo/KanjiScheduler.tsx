@@ -1,4 +1,4 @@
-import { DO_NOT_USE_OR_YOU_WILL_BE_FIRED_EXPERIMENTAL_FORM_ACTIONS, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import { supermemo, SuperMemoGrade } from 'supermemo'
 import Flashcard from '../Flashcard/Flashcard';
@@ -6,39 +6,62 @@ import { FlashcardItem } from '../Flashcard/FlashcardItem';
 import { useParams } from 'react-router-dom';
 import { fetchKanjiByLevel } from '../Kanji/N5KanjiList';
 import Navbar from '../Navbar/Navbar';
+import { fetchAvailableKanji } from '../Fetching/useKanjiFetch';
+import { supaClient } from '../Client/supaClient';
+import { useAuth } from '../Client/useAuth';
+import { getNumericUserId } from '../Client/userIdHelper';
 
 interface UpdatedFlashcard extends FlashcardItem {
   due_date: string;
 }
+
+interface StudiedFlashcardData {
+  user_id: number;
+  front: string;
+  back?: any; // jsonb
+  kanji_meaning?: string;
+  on_readings?: string;
+  name_readings?: string;
+  stroke_count?: string;
+  interval: number;
+  repetition: number;
+  efactor: number;
+  due_date: string;
+  original_deck: string;
+}
+
 //Start of Scheduler component
 const KanjiScheduler = (): JSX.Element => {
-
-
-  const [kanjiData, setKanjiData] = useState<[]>([]);
-  
-  //practiced flashcards array
+  const [kanjiData, setKanjiData] = useState<FlashcardItem[]>([]);
   const [practicedFlashcards, setPracticedFlashcards] = useState<UpdatedFlashcard[]>([]);
+  const { userId, isLoading } = useAuth();
 
   // title state
   const { title } = useParams<{ title: string }>();
 
   //fetches kanji data
   useEffect(() => {
-    const fetchKanjiData = async () => {
+    if (isLoading) return;
 
+    const fetchKanjiData = async () => {
       try {
-        const data = await fetchKanjiByLevel(title);
-        //get the first 10 only
-        const firstTen = data.slice(0, 10);
-        // console.log(data);
-        setKanjiData(firstTen);
+        const allKanji = await fetchKanjiByLevel(title || 'N5');
+        
+        if (userId) {
+          // Get user-specific available flashcards (pending + new)
+          const availableKanji = await fetchAvailableKanji(userId, allKanji);
+          setKanjiData(availableKanji);
+        } else {
+          // If not authenticated, just show first 10
+          setKanjiData(allKanji.slice(0, 10));
+        }
       } catch (error) {
         console.error('Error fetching kanji data:', error);
       }
     };
 
     fetchKanjiData();
-  }, [title]);
+  }, [title, userId, isLoading]);
 
 
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
@@ -47,30 +70,80 @@ const KanjiScheduler = (): JSX.Element => {
    *  Pratice function logic that uses practiceFlashcard function
     @PARAM grade - the grade of the flashcard that is being practiced
   */
-  const practice = (grade: SuperMemoGrade): void => {
+  const practice = async (grade: SuperMemoGrade): Promise<void> => {
+    if (!userId) {
+      console.error('User not authenticated');
+      return;
+    }
+
     const currentFlashcard = kanjiData[currentCardIndex];
+    if (!currentFlashcard) return;
 
     // Update the flashcard with the grade using the practiceFlashcard function
     const updatedFlashcard = practiceFlashcard(currentFlashcard, grade);
     console.log(updatedFlashcard);
-    // Update the flashcard in your array or database with the updatedFlashcard data
-    const updatedFlashcards = [...kanjiData];
-    //replace the current flashcard with the updated flashcard
-    updatedFlashcards[currentCardIndex] = updatedFlashcard;
+
+    try {
+      // Get numeric user ID
+      const numericUserId = await getNumericUserId(userId);
+
+      // Extract kanji data for separate columns
+      const kanjiBack = updatedFlashcard.kanjiBack;
+      const kanjiMeaning = kanjiBack?.meaning?.[0] || '';
+      const onReadings = kanjiBack?.on_readings?.join(', ') || '';
+      const nameReadings = kanjiBack?.name_readings?.join(', ') || '';
+      const strokeCount = kanjiBack?.stroke_count?.toString() || '0';
+
+      // Add or update the flashcard in studiedFlashcard table
+      const studiedData: StudiedFlashcardData = {
+        user_id: numericUserId,
+        front: updatedFlashcard.front,
+        back: updatedFlashcard.back || updatedFlashcard.kanjiBack, // Store as jsonb
+        kanji_meaning: kanjiMeaning,
+        on_readings: onReadings,
+        name_readings: nameReadings,
+        stroke_count: strokeCount,
+        interval: updatedFlashcard.interval,
+        repetition: updatedFlashcard.repetition,
+        efactor: updatedFlashcard.efactor,
+        due_date: updatedFlashcard.due_date,
+        original_deck: 'kanji'
+      };
+
+      const { error: studiedError } = await supaClient
+        .from('studied_flashcards')
+        .upsert(studiedData, {
+          onConflict: 'user_id,front,original_deck'
+        });
+
+      if (studiedError) {
+        console.error('Error updating studied flashcard:', studiedError);
+      } else {
+        console.log('Flashcard updated successfully in studiedFlashcard table');
+      }
+    } catch (error) {
+      console.error('Error updating flashcard:', error);
+    }
 
     //set practiced flashcards
     setPracticedFlashcards([...practicedFlashcards, updatedFlashcard]);
-
-    // console.log(practicedFlashcards);
    
     setCurrentCardIndex(currentCardIndex + 1);
 
-    //once all practiced move to practiced flashcards to see if there are any due
+    // If we've gone through all cards, fetch new ones
     if (currentCardIndex === kanjiData.length - 1) {
       setCurrentCardIndex(0);
-      setKanjiData(practicedFlashcards);
-      //set local storage to true
-      setReviewed(true);
+      const fetchNewFlashcards = async (): Promise<void> => {
+        try {
+          const allKanji = await fetchKanjiByLevel(title || 'N5');
+          const newData = await fetchAvailableKanji(userId, allKanji);
+          setKanjiData(newData);
+        } catch (err) {
+          console.error("Error fetching new flashcards:", err);
+        }
+      };
+
+      void fetchNewFlashcards();
     }
   };
 

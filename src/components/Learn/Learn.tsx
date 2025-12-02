@@ -8,6 +8,14 @@ const Learn = () => {
 
     //state deckData
     const [deckData, setDeckData] = useState<any[]>([]);
+    const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+
+    const checkAuth = async () => {
+        const { data: { session } } = await supaClient.auth.getSession();
+        setIsAuthenticated(!!session);
+        setIsLoading(false);
+    }
 
     const getDecks = async (): Promise<void> => {
 
@@ -28,11 +36,51 @@ const Learn = () => {
     }
 
     useEffect(() => {
-        getDecks().catch((error) => {
-            console.log(error)
-        })
+        checkAuth();
+        // Listen for auth state changes
+        const { data: { subscription } } = supaClient.auth.onAuthStateChange((_event, session) => {
+            setIsAuthenticated(!!session);
+        });
+
+        return () => {
+            subscription.unsubscribe();
+        };
     }, [])
 
+    useEffect(() => {
+        if (isAuthenticated) {
+            getDecks().catch((error) => {
+                console.log(error)
+            })
+        }
+    }, [isAuthenticated])
+
+
+    if (isLoading) {
+        return (
+            <div style={{ width: '100%', maxWidth: '100%', overflow: 'hidden' }}>
+                <div className="header-navbar">
+                    <Navbar />
+                </div>
+                <div style={{ width: '100%', padding: '0 1rem' }}>
+                    <div>Loading...</div>
+                </div>
+            </div>
+        );
+    }
+
+    if (!isAuthenticated) {
+        return (
+            <div style={{ width: '100%', maxWidth: '100%', overflow: 'hidden' }}>
+                <div className="header-navbar">
+                    <Navbar />
+                </div>
+                <div style={{ width: '100%', padding: '0 1rem', textAlign: 'center', marginTop: '2rem' }}>
+                    <h2>Please Login first</h2>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div style={{ width: '100%', maxWidth: '100%', overflow: 'hidden' }}>

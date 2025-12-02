@@ -12,6 +12,10 @@ export const menuItems = [
     url: "/login",
   },
   {
+    title: "Register",
+    url: "/login",
+  },
+  {
     title: "Leaderboard",
     url: "/leaderboard",
   },

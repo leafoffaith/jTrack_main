@@ -3,9 +3,11 @@ import dayjs from 'dayjs';
 import { supermemo, SuperMemoGrade } from 'supermemo';
 import Flashcard from '../Flashcard/Flashcard';
 import { FlashcardItem } from '../Flashcard/FlashcardItem';
-import { fetchAvailableHiragana, updateFlashcard } from '../Fetching/useHiraganaFetch';
+import { fetchAvailableHiragana } from '../Fetching/useHiraganaFetch';
 import Navbar from '../Navbar/Navbar';
 import { supaClient } from '../Client/supaClient';
+import { useAuth } from '../Client/useAuth';
+import { getNumericUserId } from '../Client/userIdHelper';
 
 interface UpdatedFlashcard extends FlashcardItem {
   due_date: string;
@@ -19,16 +21,20 @@ interface StudiedFlashcardData {
   repetition: number;
   efactor: number;
   due_date: string;
+  original_deck: string;
 }
+
 
 const HiraganaScheduler = (): JSX.Element => {
   const [hiraganaData, setHiraganaData] = useState<FlashcardItem[]>([]);
   const [practicedFlashcards, setPracticedFlashcards] = useState<UpdatedFlashcard[]>([]);
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
-  const [userId, setUserId] = useState<number>(1); // TODO: Get actual user ID from auth
+  const { userId, isLoading } = useAuth();
 
   useEffect(() => {
+    if (!userId || isLoading) return;
+
     // Fetch available flashcards (both studied and new)
     const fetchFlashcards = async (): Promise<void> => {
       try {
@@ -41,9 +47,14 @@ const HiraganaScheduler = (): JSX.Element => {
     };
 
     void fetchFlashcards();
-  }, [userId]);
+  }, [userId, isLoading]);
 
   const practice = async (grade: SuperMemoGrade): Promise<void> => {
+    if (!userId) {
+      console.error('User not authenticated');
+      return;
+    }
+
     const currentFlashcard = hiraganaData[currentCardIndex];
     if (!currentFlashcard) return;
 
@@ -51,28 +62,37 @@ const HiraganaScheduler = (): JSX.Element => {
     console.log("Updated flashcard:", updatedFlashcard);
 
     try {
-      // Update the flashcard in the hiragana table
-      await updateFlashcard(updatedFlashcard);
+      // Get numeric user ID
+      const numericUserId = await getNumericUserId(userId);
+      if (!numericUserId) {
+        console.error('Could not get numeric user ID');
+        return;
+      }
+
+      // Only update studied_flashcards table (hiragana table columns are generated/read-only)
 
       // Add or update the flashcard in studiedFlashcard table
       const studiedData: StudiedFlashcardData = {
-        user_id: userId,
+        user_id: numericUserId,
         front: updatedFlashcard.front,
         back: updatedFlashcard.back || '', // Ensure back is never undefined
         interval: updatedFlashcard.interval,
         repetition: updatedFlashcard.repetition,
         efactor: updatedFlashcard.efactor,
-        due_date: updatedFlashcard.due_date
+        due_date: updatedFlashcard.due_date,
+        original_deck: 'hiragana'
       };
 
       const { error: studiedError } = await supaClient
         .from('studied_flashcards')
-        .upsert(studiedData);
+        .upsert(studiedData, {
+          onConflict: 'user_id,front,original_deck'
+        });
 
       if (studiedError) {
         console.error('Error updating studied flashcard:', studiedError);
       } else {
-        console.log('Flashcard updated successfully in studiedFashcard table');
+        console.log('Flashcard updated successfully in studiedFlashcard table');
       }
 
     } catch (error) {

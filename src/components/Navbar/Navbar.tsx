@@ -5,8 +5,45 @@ import { menuItems } from "./menuItems";
 import MenuItemsComponent from "./MenuItemsComponent";
 import { supaClient } from "../Client/supaClient";
 import { slide as Menu } from 'react-burger-menu'
+import { useEffect, useState } from "react";
 
 const Navbar = () => {
+  const [username, setUsername] = useState<string | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const { data: { session } } = await supaClient.auth.getSession();
+      if (session?.user) {
+        setIsAuthenticated(true);
+        // Get username from user metadata (stored during registration)
+        const usernameFromMetadata = session.user.user_metadata?.username;
+        setUsername(usernameFromMetadata || session.user.email || null);
+      } else {
+        setIsAuthenticated(false);
+        setUsername(null);
+      }
+    };
+
+    fetchUserData();
+
+    // Listen for auth state changes
+    const { data: { subscription } } = supaClient.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        setIsAuthenticated(true);
+        // Get username from user metadata
+        const usernameFromMetadata = session.user.user_metadata?.username;
+        setUsername(usernameFromMetadata || session.user.email || null);
+      } else {
+        setIsAuthenticated(false);
+        setUsername(null);
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
 
   const styles = {
     bmBurgerButton: {
@@ -90,18 +127,31 @@ const Navbar = () => {
                 </Link> */}
         </div>
         <div id="noDis">
-          {menuItems.map((item, index) => {
-            return (
-              <MenuItemsComponent title={item.title} url={item.url} key={index} />
-            )
-          })}
+          {menuItems
+            .filter(item => {
+              // Hide Register option if user is authenticated
+              if (item.title === 'Register' && isAuthenticated) {
+                return false;
+              }
+              return true;
+            })
+            .map((item, index) => {
+              return (
+                <MenuItemsComponent title={item.title} url={item.url} key={index} />
+              )
+            })}
         </div>
         {/* <span className="navbar__right__item input-container">
                 <button onClick={signOut}>Sign Out</button>
             </span> */}
         <span className="navbar__right__item input-container">
           {/* <input id="Search" type="text" placeholder="Search for Kanji, Sentences and more" className="input-field" /> */}
-          <button onClick={() => void signOut()}>Sign Out</button>
+          {isAuthenticated && username && (
+            <span style={{ marginRight: '1rem', color: 'white' }}>{username}</span>
+          )}
+          {isAuthenticated && (
+            <button onClick={() => void signOut()}>Sign Out</button>
+          )}
         </span>
       </div>
     </>

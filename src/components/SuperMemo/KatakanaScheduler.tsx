@@ -3,11 +3,25 @@ import dayjs from 'dayjs';
 import { supermemo, SuperMemoGrade } from 'supermemo';
 import Flashcard from '../Flashcard/Flashcard';
 import { FlashcardItem } from '../Flashcard/FlashcardItem';
-import { createKatakanaFlashcards, updateKatakana } from '../Fetching/useKatakanaFetch';
+import { fetchAvailableKatakana } from '../Fetching/useKatakanaFetch';
 import Navbar from '../Navbar/Navbar';
+import { supaClient } from '../Client/supaClient';
+import { useAuth } from '../Client/useAuth';
+import { getNumericUserId } from '../Client/userIdHelper';
 
 interface UpdatedFlashcard extends FlashcardItem {
   due_date: string;
+}
+
+interface StudiedFlashcardData {
+  user_id: number;
+  front: string;
+  back: string;
+  interval: number;
+  repetition: number;
+  efactor: number;
+  due_date: string;
+  original_deck: string;
 }
 
 const KatakanaScheduler = (): JSX.Element => {
@@ -15,40 +29,84 @@ const KatakanaScheduler = (): JSX.Element => {
   const [practicedFlashcards, setPracticedFlashcards] = useState<UpdatedFlashcard[]>([]);
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
+  const { userId, isLoading } = useAuth();
 
   useEffect(() => {
-    createKatakanaFlashcards()
-      .then((data) => {
+    if (!userId || isLoading) return;
+
+    const fetchFlashcards = async (): Promise<void> => {
+      try {
+        const data = await fetchAvailableKatakana(userId);
+        console.log("Available katakana flashcards:", data);
         setKatakanaData(data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, []);
+      } catch (err) {
+        console.error("Error fetching flashcards:", err);
+      }
+    };
+
+    void fetchFlashcards();
+  }, [userId, isLoading]);
 
   const practice = async (grade: SuperMemoGrade) => {
+    if (!userId) {
+      console.error('User not authenticated');
+      return;
+    }
+
     const currentFlashcard = katakanaData[currentCardIndex];
+    if (!currentFlashcard) return;
+
     const updatedFlashcard = practiceFlashcard(currentFlashcard, grade);
 
     try {
-      await updateKatakana(updatedFlashcard);
-      console.log('Flashcard updated');
-    } catch (error) {
-      console.log('Error updating flashcard:', error);
-    }
+      // Get numeric user ID
+      const numericUserId = await getNumericUserId(userId);
 
-    // const updatedFlashcards = [...katakanaData];
-    // updatedFlashcards[currentCardIndex] = updatedFlashcard;
+      // Only update studied_flashcards table (katakana table columns are generated/read-only)
+
+      // Add or update the flashcard in studiedFlashcard table
+      const studiedData: StudiedFlashcardData = {
+        user_id: numericUserId,
+        front: updatedFlashcard.front,
+        back: updatedFlashcard.back || '',
+        interval: updatedFlashcard.interval,
+        repetition: updatedFlashcard.repetition,
+        efactor: updatedFlashcard.efactor,
+        due_date: updatedFlashcard.due_date,
+        original_deck: 'katakana'
+      };
+
+      const { error: studiedError } = await supaClient
+        .from('studied_flashcards')
+        .upsert(studiedData, {
+          onConflict: 'user_id,front,original_deck'
+        });
+
+      if (studiedError) {
+        console.error('Error updating studied flashcard:', studiedError);
+      } else {
+        console.log('Flashcard updated successfully in studiedFlashcard table');
+      }
+    } catch (error) {
+      console.error('Error updating flashcard:', error);
+    }
 
     setPracticedFlashcards([...practicedFlashcards, updatedFlashcard]);
     setCurrentCardIndex(currentCardIndex + 1);
 
-    //if you reach the END then data is set to the practiced 
-    //flashcards and no more cards are shown cause none will be due
-    //in case any are due to eFactor or rep, they will be
+    // If we've gone through all cards, fetch new ones
     if (currentCardIndex === katakanaData.length - 1) {
       setCurrentCardIndex(0);
-      setKatakanaData(practicedFlashcards);
+      const fetchNewFlashcards = async (): Promise<void> => {
+        try {
+          const newData = await fetchAvailableKatakana(userId);
+          setKatakanaData(newData);
+        } catch (err) {
+          console.error("Error fetching new flashcards:", err);
+        }
+      };
+
+      void fetchNewFlashcards();
     }
   };
 

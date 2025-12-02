@@ -5,50 +5,67 @@ import Flashcard from '../Flashcard/Flashcard';
 import { FlashcardItem } from '../Flashcard/FlashcardItem';
 import { createSentenceFlashcards, createMultipleChoiceOptions } from '../JMDict/JMDict';
 import Navbar from '../Navbar/Navbar';
+import { fetchAvailableSentences } from '../Fetching/useSentenceFetch';
+import { supaClient } from '../Client/supaClient';
+import { useAuth } from '../Client/useAuth';
+import { getNumericUserId } from '../Client/userIdHelper';
 
 interface UpdatedFlashcard extends FlashcardItem {
   due_date: string;
 }
+
+interface StudiedFlashcardData {
+  user_id: number;
+  front: string;
+  back?: string;
+  interval: number;
+  repetition: number;
+  efactor: number;
+  due_date: string;
+  original_deck: string;
+}
+
 //Start of Scheduler component
 const SentenceScheduler = (): JSX.Element => {
-
   //STATES
-  const [sentenceData, setSentenceData] = useState<[]>([]);
+  const [sentenceData, setSentenceData] = useState<FlashcardItem[]>([]);
   
   //practiced flashcards array
   const [practicedFlashcards, setPracticedFlashcards] = useState<UpdatedFlashcard[]>([]);
 
   //state for the options that will be generated alongside the flashcard and will be an array of arrays
-  const [options, setOptions] = useState<[]>([]);
+  const [options, setOptions] = useState<string[]>([]);
 
   //pass down the state of the visiblity of the flashcard back component from here
   const [isFlipped, setIsFlipped] = useState(false);
   
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
+  const { userId, isLoading } = useAuth();
 
-  //fetches kanji data
+  //fetches sentence data
   useEffect(() => {
+    if (isLoading) return;
 
-    // fetchKanjiData();
     const fetchSentenceData = async () => {
-        try {
-            const data = await createSentenceFlashcards();
-            setSentenceData(data);
-            console.log(sentenceData)
-        } catch (error) {
-            console.error('Error fetching sentence data:', error);
+      try {
+        const allSentences = await createSentenceFlashcards();
+        
+        if (userId) {
+          // Get user-specific available flashcards (pending + new)
+          const availableSentences = await fetchAvailableSentences(userId, allSentences);
+          setSentenceData(availableSentences);
+        } else {
+          // If not authenticated, just show first 10
+          setSentenceData(allSentences.slice(0, 10));
         }
-        }
+        console.log("Sentence data fetched successfully");
+      } catch (error) {
+        console.error('Error fetching sentence data:', error);
+      }
+    };
 
-        fetchSentenceData()
-        .then(() => {
-            console.log("Sentence data fetched successfully")
-        }
-        ).catch((error) => {
-            console.log(error)
-        }
-        )
-  }, []);
+    void fetchSentenceData();
+  }, [userId, isLoading]);
 
 
 
@@ -57,28 +74,69 @@ const SentenceScheduler = (): JSX.Element => {
     @PARAM grade - the grade of the flashcard that is being practiced
     @RETURN void
   */
-  const practice = (grade: SuperMemoGrade): void => {
+  const practice = async (grade: SuperMemoGrade): Promise<void> => {
+    if (!userId) {
+      console.error('User not authenticated');
+      return;
+    }
+
     const currentFlashcard = sentenceData[currentCardIndex];
+    if (!currentFlashcard) return;
 
     // Update the flashcard with the grade using the practiceFlashcard function
     const updatedFlashcard = practiceFlashcard(currentFlashcard, grade);
     console.log(updatedFlashcard);
-    // Update the flashcard in your array or database with the updatedFlashcard data
-    const updatedFlashcards = [...sentenceData];
-    //replace the current flashcard with the updated flashcard
-    updatedFlashcards[currentCardIndex] = updatedFlashcard;
+
+    try {
+      // Get numeric user ID
+      const numericUserId = await getNumericUserId(userId);
+
+      // Add or update the flashcard in studiedFlashcard table
+      const studiedData: StudiedFlashcardData = {
+        user_id: numericUserId,
+        front: updatedFlashcard.front,
+        back: updatedFlashcard.back,
+        interval: updatedFlashcard.interval,
+        repetition: updatedFlashcard.repetition,
+        efactor: updatedFlashcard.efactor,
+        due_date: updatedFlashcard.due_date,
+        original_deck: 'sentence'
+      };
+
+      const { error: studiedError } = await supaClient
+        .from('studied_flashcards')
+        .upsert(studiedData, {
+          onConflict: 'user_id,front,original_deck'
+        });
+
+      if (studiedError) {
+        console.error('Error updating studied flashcard:', studiedError);
+      } else {
+        console.log('Flashcard updated successfully in studiedFlashcard table');
+      }
+    } catch (error) {
+      console.error('Error updating flashcard:', error);
+    }
 
     //set practiced flashcards
     setPracticedFlashcards([...practicedFlashcards, updatedFlashcard]);
-
-    // console.log(practicedFlashcards);
    
     setCurrentCardIndex(currentCardIndex + 1);
 
-    //once all practiced move to practiced flashcards to see if there are any due
+    // If we've gone through all cards, fetch new ones
     if (currentCardIndex === sentenceData.length - 1) {
       setCurrentCardIndex(0);
-      setSentenceData(practicedFlashcards);
+      const fetchNewFlashcards = async (): Promise<void> => {
+        try {
+          const allSentences = await createSentenceFlashcards();
+          const newData = await fetchAvailableSentences(userId, allSentences);
+          setSentenceData(newData);
+        } catch (err) {
+          console.error("Error fetching new flashcards:", err);
+        }
+      };
+
+      void fetchNewFlashcards();
     }
   };
 
