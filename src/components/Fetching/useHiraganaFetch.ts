@@ -2,6 +2,7 @@ import { supaClient } from "../Client/supaClient";
 import { FlashcardItem } from "../Flashcard/FlashcardItem";
 import dayjs from "dayjs";
 import { getNumericUserId } from "../Client/userIdHelper";
+import { checkUserHasStudiedRecently, updateUserHasStudied, getUserHasStudied } from "../Client/userStudyHelper";
 
 interface HiraganaItem {
   hiragana: string;
@@ -17,6 +18,7 @@ interface StudiedFlashcard extends FlashcardItem {
   original_deck?: string;
   due_date?: string;
   back?: string | any; // Can be string or jsonb
+  last_studied?: string; // Timestamp when card was studied
 }
 
 //Fetching new Hiragana
@@ -63,32 +65,36 @@ const fetchUserHiragana = async (
 
 export const fetchAvailableHiragana = async (
   userId: string
-): Promise<FlashcardItem[]> => {
+): Promise<{ cards: FlashcardItem[]; message?: string }> => {
   if (!userId) {
-    return [];
+    return { cards: [] };
   }
 
-  //Already studied flashcards
+  // Check if user has studied recently (within 24 hours)
+  const hasStudiedRecently = await checkUserHasStudiedRecently(userId);
+  await updateUserHasStudied(userId, hasStudiedRecently);
+
+  // Already studied flashcards
   const studiedFlashcards = await fetchUserHiragana(userId);
 
-  //Fetching all new hiragana
+  // Fetching all new hiragana
   const hiragana = await fetchHiragana();
 
   if (!hiragana) {
     console.error("Failed to fetch hiragana data");
-    return [];
+    return { cards: [] };
   }
 
   // Get all studied hiragana characters
   const studiedFronts = studiedFlashcards.map((card) => card.front);
 
-  // Get currently due flashcards (prioritize these)
+  // Priority 1: Get currently due flashcards (due_date < current time)
   const dueFlashcards = studiedFlashcards
     .filter((card) => {
       if (!card.due_date) return false;
       const dueDate = new Date(card.due_date);
       const now = new Date();
-      return dueDate <= now;
+      return dueDate < now; // Past due date
     })
     .map((card) => ({
       front: card.front,
@@ -99,32 +105,34 @@ export const fetchAvailableHiragana = async (
       due_date: card.due_date,
     }));
 
-  // Filter out studied hiragana to get new ones
-  const newHiragana = hiragana
-    .filter((h) => !studiedFronts.includes(h.hiragana))
-    .slice(0, 5); // Get only 5 new hiragana
+  // If there are due cards, show ONLY those (limit to 3 total per session)
+  if (dueFlashcards.length > 0) {
+    return { cards: dueFlashcards.slice(0, 3) };
+  }
 
-  // Combine: due flashcards first, then new flashcards
-  const availableFlashcards = [
-    ...dueFlashcards.map((card) => ({
-      front: card.front,
-      back: card.back,
-      interval: card.interval,
-      repetition: card.repetition,
-      efactor: card.efactor,
-      due_date: card.due_date,
-    })),
-    ...newHiragana.map((h) => ({
+  // Priority 2: No cards are due AND user hasn't studied in 24 hours
+  if (!hasStudiedRecently) {
+    // Filter out studied hiragana to get new ones
+    const allNewHiragana = hiragana.filter((h) => !studiedFronts.includes(h.hiragana));
+    
+    // Limit to 3 new cards per session
+    const newHiragana = allNewHiragana.slice(0, 3).map((h) => ({
       front: h.hiragana,
       back: h.romaji,
-      interval: h.interval ?? 1,
-      repetition: h.repetition ?? 0,
-      efactor: h.eFactor ?? 2.5,
-      due_date: h.due_date || dayjs().toISOString(),
-    })),
-  ];
+      interval: 1,
+      repetition: 0,
+      efactor: 2.5,
+      due_date: dayjs().toISOString(),
+    }));
 
-  return availableFlashcards;
+    return { cards: newHiragana };
+  }
+
+  // Priority 3: User has studied within 24 hours AND no cards are due
+  return { 
+    cards: [],
+    message: "You have finished studying for now! Come back later :)"
+  };
 };
 
 // Removed updateFlashcard - hiragana table columns are read-only/generated

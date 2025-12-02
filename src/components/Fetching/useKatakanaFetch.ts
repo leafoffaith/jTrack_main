@@ -2,6 +2,7 @@ import { supaClient } from "../Client/supaClient";
 import { FlashcardItem } from "../Flashcard/FlashcardItem";
 import dayjs from "dayjs";
 import { getNumericUserId } from "../Client/userIdHelper";
+import { checkUserHasStudiedRecently, updateUserHasStudied } from "../Client/userStudyHelper";
 
 interface KatakanaItem {
   front: string;
@@ -17,6 +18,7 @@ interface StudiedFlashcard extends FlashcardItem {
   original_deck?: string;
   due_date?: string;
   back?: string | any;
+  last_studied?: string; // Timestamp when card was studied
 }
 
 const fetchKatakana = async (): Promise<KatakanaItem[]> => {
@@ -61,32 +63,36 @@ const fetchUserKatakana = async (
 
 export const fetchAvailableKatakana = async (
   userId: string
-): Promise<FlashcardItem[]> => {
+): Promise<{ cards: FlashcardItem[]; message?: string }> => {
   if (!userId) {
-    return [];
+    return { cards: [] };
   }
 
-  //Already studied flashcards
+  // Check if user has studied recently (within 24 hours)
+  const hasStudiedRecently = await checkUserHasStudiedRecently(userId);
+  await updateUserHasStudied(userId, hasStudiedRecently);
+
+  // Already studied flashcards
   const studiedFlashcards = await fetchUserKatakana(userId);
 
-  //Fetching all new katakana
+  // Fetching all new katakana
   const katakana = await fetchKatakana();
 
   if (!katakana) {
     console.error("Failed to fetch katakana data");
-    return [];
+    return { cards: [] };
   }
 
   // Get all studied katakana characters
   const studiedFronts = studiedFlashcards.map((card) => card.front);
 
-  // Get currently due flashcards (prioritize these)
+  // Priority 1: Get currently due flashcards (due_date < current time)
   const dueFlashcards = studiedFlashcards
     .filter((card) => {
       if (!card.due_date) return false;
       const dueDate = new Date(card.due_date);
       const now = new Date();
-      return dueDate <= now;
+      return dueDate < now; // Past due date
     })
     .map((card) => ({
       front: card.front,
@@ -97,25 +103,34 @@ export const fetchAvailableKatakana = async (
       due_date: card.due_date,
     }));
 
-  // Filter out studied katakana to get new ones
-  const newKatakana = katakana
-    .filter((k) => !studiedFronts.includes(k.front))
-    .slice(0, 5); // Get only 5 new katakana
+  // If there are due cards, show ONLY those (limit to 3 total per session)
+  if (dueFlashcards.length > 0) {
+    return { cards: dueFlashcards.slice(0, 3) };
+  }
 
-  // Combine: due flashcards first, then new flashcards
-  const availableFlashcards = [
-    ...dueFlashcards,
-    ...newKatakana.map((k) => ({
+  // Priority 2: No cards are due AND user hasn't studied in 24 hours
+  if (!hasStudiedRecently) {
+    // Filter out studied katakana to get new ones
+    const allNewKatakana = katakana.filter((k) => !studiedFronts.includes(k.front));
+    
+    // Limit to 3 new cards per session
+    const newKatakana = allNewKatakana.slice(0, 3).map((k) => ({
       front: k.front,
       back: k.back,
-      interval: k.interval ?? 1,
-      repetition: k.repetition ?? 0,
-      efactor: k.eFactor ?? 2.5,
-      due_date: k.due_date || dayjs().toISOString(),
-    })),
-  ];
+      interval: 1,
+      repetition: 0,
+      efactor: 2.5,
+      due_date: dayjs().toISOString(),
+    }));
 
-  return availableFlashcards;
+    return { cards: newKatakana };
+  }
+
+  // Priority 3: User has studied within 24 hours AND no cards are due
+  return { 
+    cards: [],
+    message: "You have finished studying for now! Come back later :)"
+  };
 };
 
 // Removed updateKatakana - katakana table columns are read-only/generated

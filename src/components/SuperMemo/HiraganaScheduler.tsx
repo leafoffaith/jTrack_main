@@ -8,6 +8,7 @@ import Navbar from '../Navbar/Navbar';
 import { supaClient } from '../Client/supaClient';
 import { useAuth } from '../Client/useAuth';
 import { getNumericUserId } from '../Client/userIdHelper';
+import { initializeSession } from '../Client/sessionHelper';
 
 interface UpdatedFlashcard extends FlashcardItem {
   due_date: string;
@@ -22,6 +23,7 @@ interface StudiedFlashcardData {
   efactor: number;
   due_date: string;
   original_deck: string;
+  last_studied: string; // Timestamp when card was studied
 }
 
 
@@ -30,17 +32,23 @@ const HiraganaScheduler = (): JSX.Element => {
   const [practicedFlashcards, setPracticedFlashcards] = useState<UpdatedFlashcard[]>([]);
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
+  const [studyMessage, setStudyMessage] = useState<string | undefined>(undefined);
   const { userId, isLoading } = useAuth();
 
   useEffect(() => {
+    // Initialize session tracking
+    initializeSession();
+    
     if (!userId || isLoading) return;
 
     // Fetch available flashcards (both studied and new)
     const fetchFlashcards = async (): Promise<void> => {
       try {
-        const data = await fetchAvailableHiragana(userId);
-        console.log("Available flashcards:", data);
-        setHiraganaData(data);
+        const result = await fetchAvailableHiragana(userId);
+        console.log("Available flashcards:", result.cards);
+        setHiraganaData(result.cards);
+        setStudyMessage(result.message);
+        setCurrentCardIndex(0); // Reset to first card
       } catch (err) {
         console.error("Error fetching flashcards:", err);
       }
@@ -72,6 +80,7 @@ const HiraganaScheduler = (): JSX.Element => {
       // Only update studied_flashcards table (hiragana table columns are generated/read-only)
 
       // Add or update the flashcard in studiedFlashcard table
+      const now = new Date().toISOString();
       const studiedData: StudiedFlashcardData = {
         user_id: numericUserId,
         front: updatedFlashcard.front,
@@ -80,14 +89,34 @@ const HiraganaScheduler = (): JSX.Element => {
         repetition: updatedFlashcard.repetition,
         efactor: updatedFlashcard.efactor,
         due_date: updatedFlashcard.due_date,
-        original_deck: 'hiragana'
+        original_deck: 'hiragana',
+        last_studied: now // Update last_studied timestamp
       };
 
-      const { error: studiedError } = await supaClient
+      // Check if record exists first, then update or insert
+      const { data: existing } = await supaClient
         .from('studied_flashcards')
-        .upsert(studiedData, {
-          onConflict: 'user_id,front,original_deck'
-        });
+        .select('id')
+        .eq('user_id', numericUserId)
+        .eq('front', updatedFlashcard.front)
+        .eq('original_deck', 'hiragana')
+        .maybeSingle();
+
+      let studiedError;
+      if (existing?.id) {
+        // Update existing record
+        const { error } = await supaClient
+          .from('studied_flashcards')
+          .update(studiedData)
+          .eq('id', existing.id);
+        studiedError = error;
+      } else {
+        // Insert new record
+        const { error } = await supaClient
+          .from('studied_flashcards')
+          .insert(studiedData);
+        studiedError = error;
+      }
 
       if (studiedError) {
         console.error('Error updating studied flashcard:', studiedError);
@@ -153,7 +182,11 @@ const HiraganaScheduler = (): JSX.Element => {
         <Navbar />
       </div>
       <div className="main-content">
-        {currentFlashcard || isDue ? (
+        {studyMessage ? (
+          <div>
+            <h3>{studyMessage}</h3>
+          </div>
+        ) : currentFlashcard ? (
           <div>
             <Flashcard
               front={currentFlashcard.front}
@@ -167,7 +200,7 @@ const HiraganaScheduler = (): JSX.Element => {
           </div>
         ) : (
           <div>
-            <h3>No flashcards due</h3>
+            <h3>No flashcards available</h3>
           </div>
         )}
       </div>

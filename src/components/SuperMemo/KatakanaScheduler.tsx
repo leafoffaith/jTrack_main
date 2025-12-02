@@ -8,6 +8,7 @@ import Navbar from '../Navbar/Navbar';
 import { supaClient } from '../Client/supaClient';
 import { useAuth } from '../Client/useAuth';
 import { getNumericUserId } from '../Client/userIdHelper';
+import { initializeSession } from '../Client/sessionHelper';
 
 interface UpdatedFlashcard extends FlashcardItem {
   due_date: string;
@@ -22,6 +23,7 @@ interface StudiedFlashcardData {
   efactor: number;
   due_date: string;
   original_deck: string;
+  last_studied: string; // Timestamp when card was studied
 }
 
 const KatakanaScheduler = (): JSX.Element => {
@@ -29,16 +31,22 @@ const KatakanaScheduler = (): JSX.Element => {
   const [practicedFlashcards, setPracticedFlashcards] = useState<UpdatedFlashcard[]>([]);
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
+  const [studyMessage, setStudyMessage] = useState<string | undefined>(undefined);
   const { userId, isLoading } = useAuth();
 
   useEffect(() => {
+    // Initialize session tracking
+    initializeSession();
+    
     if (!userId || isLoading) return;
 
     const fetchFlashcards = async (): Promise<void> => {
       try {
-        const data = await fetchAvailableKatakana(userId);
-        console.log("Available katakana flashcards:", data);
-        setKatakanaData(data);
+        const result = await fetchAvailableKatakana(userId);
+        console.log("Available katakana flashcards:", result.cards);
+        setKatakanaData(result.cards);
+        setStudyMessage(result.message);
+        setCurrentCardIndex(0); // Reset to first card
       } catch (err) {
         console.error("Error fetching flashcards:", err);
       }
@@ -65,6 +73,7 @@ const KatakanaScheduler = (): JSX.Element => {
       // Only update studied_flashcards table (katakana table columns are generated/read-only)
 
       // Add or update the flashcard in studiedFlashcard table
+      const now = new Date().toISOString();
       const studiedData: StudiedFlashcardData = {
         user_id: numericUserId,
         front: updatedFlashcard.front,
@@ -73,14 +82,34 @@ const KatakanaScheduler = (): JSX.Element => {
         repetition: updatedFlashcard.repetition,
         efactor: updatedFlashcard.efactor,
         due_date: updatedFlashcard.due_date,
-        original_deck: 'katakana'
+        original_deck: 'katakana',
+        last_studied: now // Update last_studied timestamp
       };
 
-      const { error: studiedError } = await supaClient
+      // Check if record exists first, then update or insert
+      const { data: existing } = await supaClient
         .from('studied_flashcards')
-        .upsert(studiedData, {
-          onConflict: 'user_id,front,original_deck'
-        });
+        .select('id')
+        .eq('user_id', numericUserId)
+        .eq('front', updatedFlashcard.front)
+        .eq('original_deck', 'katakana')
+        .maybeSingle();
+
+      let studiedError;
+      if (existing?.id) {
+        // Update existing record
+        const { error } = await supaClient
+          .from('studied_flashcards')
+          .update(studiedData)
+          .eq('id', existing.id);
+        studiedError = error;
+      } else {
+        // Insert new record
+        const { error } = await supaClient
+          .from('studied_flashcards')
+          .insert(studiedData);
+        studiedError = error;
+      }
 
       if (studiedError) {
         console.error('Error updating studied flashcard:', studiedError);
@@ -149,21 +178,27 @@ const KatakanaScheduler = (): JSX.Element => {
       <div className="header-navbar">
         <Navbar />
       </div>
-      {currentFlashcard && isDue ? (
-        <div>
-          <Flashcard
-            front={currentFlashcard.front}
-            back={currentFlashcard.back}
-            flipped={isFlipped}
-            setIsFlipped={setIsFlipped}
-            practice={practice}
-          />
-        </div>
-      ) : (
-        <div>
-          <h3>No flashcards due</h3>
-        </div>
-      )}
+      <div className="main-content">
+        {studyMessage ? (
+          <div>
+            <h3>{studyMessage}</h3>
+          </div>
+        ) : currentFlashcard ? (
+          <div>
+            <Flashcard
+              front={currentFlashcard.front}
+              back={currentFlashcard.back}
+              flipped={isFlipped}
+              setIsFlipped={setIsFlipped}
+              practice={practice}
+            />
+          </div>
+        ) : (
+          <div>
+            <h3>No flashcards available</h3>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
