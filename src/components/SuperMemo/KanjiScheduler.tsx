@@ -200,6 +200,7 @@ const KanjiScheduler = (): JSX.Element => {
             flipped={isFlipped}
             setIsFlipped={setIsFlipped}
             practice={practice}
+            isDue={isDue}
           />
           {/* <button onClick={() => setIsFlipped(!isFlipped)}>Show answer</button> */}
         </div>

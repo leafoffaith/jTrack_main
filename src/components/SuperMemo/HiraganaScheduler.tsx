@@ -167,7 +167,7 @@ const HiraganaScheduler = (): JSX.Element => {
     }
     const currentDate = dayjs();
     const flashcardDueDate = dayjs(due_date);
-    return flashcardDueDate.isSame(currentDate, 'day') || flashcardDueDate.isBefore(currentDate);
+    return flashcardDueDate.isSame(currentDate, 'day');
   };
 
   const isDue = currentFlashcard && isFlashcardDue(currentFlashcard.due_date);
@@ -196,6 +196,7 @@ const HiraganaScheduler = (): JSX.Element => {
               practice={(grade: SuperMemoGrade) => {
                 void practice(grade);
               }}
+              isDue={isDue}
             />
           </div>
         ) : (

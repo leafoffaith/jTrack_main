@@ -196,7 +196,7 @@ const SentenceScheduler = (): JSX.Element => {
       </div>
       {currentFlashcard && isDue ? (
         <div>
-           <Flashcard options={options} front={currentFlashcard.front} flipped={isFlipped} setIsFlipped={setIsFlipped} back={currentFlashcard.back} practice={practice}/> 
+           <Flashcard options={options} front={currentFlashcard.front} flipped={isFlipped} setIsFlipped={setIsFlipped} back={currentFlashcard.back} practice={practice} isDue={isDue}/> 
             {/* <h1>{options[0]}</h1> */}
         </div>
       ) : (

@@ -191,6 +191,7 @@ const KatakanaScheduler = (): JSX.Element => {
               flipped={isFlipped}
               setIsFlipped={setIsFlipped}
               practice={practice}
+              isDue={isDue}
             />
           </div>
         ) : (

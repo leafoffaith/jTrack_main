@@ -17,6 +17,7 @@ interface FlashcardProps {
   setIsFlipped: React.Dispatch<React.SetStateAction<boolean>>;
   practice?: (grade: SuperMemoGrade) => void;
   options?: string[];
+  isDue?: boolean;
 }
 
 const Flashcard: React.FC<FlashcardProps> = ({
@@ -27,6 +28,7 @@ const Flashcard: React.FC<FlashcardProps> = ({
   front,
   back,
   kanjiBack,
+  isDue,
 }) => {
   const [timer, setTimer] = useState(60);
   const [flip, setFlip] = useState(false);
@@ -101,6 +103,20 @@ const Flashcard: React.FC<FlashcardProps> = ({
   return (
     <div className="flashcard card">
       <div>
+        {isDue && (
+          <div style={{
+            padding: '8px 12px',
+            backgroundColor: '#ff9800',
+            color: 'white',
+            borderRadius: '4px 4px 0 0',
+            fontSize: '14px',
+            fontWeight: 'bold',
+            textAlign: 'center',
+            marginBottom: '8px'
+          }}>
+            Due Card
+          </div>
+        )}
         <div>
           <FlashcardFront front={front} flipped={flipped} />
           {options && (
