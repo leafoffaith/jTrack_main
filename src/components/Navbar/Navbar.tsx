@@ -1,10 +1,7 @@
-//create navbar component
 import { Link } from "react-router-dom";
-import "./Navbar.css";
-import { menuItems } from "./menuItems";
-import MenuItemsComponent from "./MenuItemsComponent";
+import { Button } from "../ui/button";
+import { BookOpen } from "lucide-react";
 import { supaClient } from "../Client/supaClient";
-import { slide as Menu } from 'react-burger-menu'
 import { useEffect, useState } from "react";
 
 const Navbar = () => {
@@ -45,63 +42,6 @@ const Navbar = () => {
     };
   }, []);
 
-  const styles = {
-    bmBurgerButton: {
-      position: 'fixed',
-      width: '36px',
-      height: '30px',
-      left: '36px',
-      top: '36px'
-    },
-    bmBurgerBars: {
-      background: '#373a47'
-    },
-    bmBurgerBarsHover: {
-      background: '#a90000'
-    },
-    bmCrossButton: {
-      height: '24px',
-      width: '24px'
-    },
-    bmCross: {
-      background: '#bdc3c7'
-    },
-    bmMenuWrap: {
-      position: 'fixed',
-      height: '100%'
-    },
-    bmMenu: {
-      background: '#373a47',
-      padding: '2.5em 0 0 0',
-      fontSize: '1.15em'
-    },
-    bmMorphShape: {
-      fill: '#373a47'
-    },
-    bmItemList: {
-      color: '#b8b7ad',
-      padding: '0',
-      display: 'flex',
-      flexDirection: 'column',
-    },
-    bmItem: {
-      color: 'white',
-      display: 'block',
-      textAlign: 'left',
-      padding: '1rem 1.5rem',
-      textDecoration: 'none',
-      fontSize: '1.2rem',
-      width: '100%',
-      transition: 'background-color 0.2s ease',
-      '&:hover': {
-        backgroundColor: '#4a4d5c'
-      }
-    },
-    bmOverlay: {
-      background: 'rgba(0, 0, 0, 0.3)'
-    }
-  }
-
   const signOut = async () => {
     const { error } = await supaClient.auth.signOut();
     if (error) {
@@ -110,51 +50,48 @@ const Navbar = () => {
   };
 
   return (
-    <>
-      <div id="oc" className="navbar">
-        <div className="navbar__left">
-          <div id="menu">
-            <Menu outerContainerId={'oc'} styles={styles}>
-              <a href="/">Home</a>
-              <a href="/learn">Learn</a>
-              <a href="/leaderboard">Leaderboard</a>
-              <a href="/profile">Profile</a>
-              <a href="/awards">Achievements</a>
-            </Menu>
+    <nav className="border-b bg-card">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex h-16 items-center justify-between">
+          <div className="flex items-center gap-8">
+            <Link to="/" className="flex items-center gap-2 font-semibold text-lg">
+              <BookOpen className="h-6 w-6 text-primary" />
+              <span>JTrack</span>
+            </Link>
+            <div className="hidden md:flex items-center gap-6">
+              <Link to="/" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                Home
+              </Link>
+              <Link to="/learn" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                Learn
+              </Link>
+            </div>
           </div>
-          {/* <Link to="/" className="link">
-                    <span className="logo">JTrack</span>
-                </Link> */}
+
+          <div className="flex items-center gap-4">
+            {isAuthenticated ? (
+              <>
+                <span className="text-sm text-muted-foreground hidden sm:inline">{username}</span>
+                <Button variant="outline" onClick={() => void signOut()} size="sm">
+                  Sign Out
+                </Button>
+              </>
+            ) : (
+              <>
+                <Link to="/login">
+                  <Button variant="ghost" size="sm">
+                    Login
+                  </Button>
+                </Link>
+                <Link to="/login">
+                  <Button size="sm">Get Started</Button>
+                </Link>
+              </>
+            )}
+          </div>
         </div>
-        <div id="noDis">
-          {menuItems
-            .filter(item => {
-              // Hide Register option if user is authenticated
-              if (item.title === 'Register' && isAuthenticated) {
-                return false;
-              }
-              return true;
-            })
-            .map((item, index) => {
-              return (
-                <MenuItemsComponent title={item.title} url={item.url} key={index} />
-              )
-            })}
-        </div>
-        {/* <span className="navbar__right__item input-container">
-                <button onClick={signOut}>Sign Out</button>
-            </span> */}
-        <span className="navbar__right__item input-container">
-          {/* <input id="Search" type="text" placeholder="Search for Kanji, Sentences and more" className="input-field" /> */}
-          {isAuthenticated && username && (
-            <span style={{ marginRight: '1rem', color: 'white' }}>{username}</span>
-          )}
-          {isAuthenticated && (
-            <button onClick={() => void signOut()}>Sign Out</button>
-          )}
-        </span>
       </div>
-    </>
+    </nav>
   );
 };
 

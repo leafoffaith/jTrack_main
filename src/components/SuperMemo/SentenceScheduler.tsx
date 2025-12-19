@@ -47,7 +47,7 @@ const SentenceScheduler = (): JSX.Element => {
     if (isLoading) return;
 
     const fetchSentenceData = async () => {
-      try {
+        try {
         const allSentences = await createSentenceFlashcards();
         
         if (userId) {
@@ -59,9 +59,9 @@ const SentenceScheduler = (): JSX.Element => {
           setSentenceData(allSentences.slice(0, 10));
         }
         console.log("Sentence data fetched successfully");
-      } catch (error) {
-        console.error('Error fetching sentence data:', error);
-      }
+        } catch (error) {
+            console.error('Error fetching sentence data:', error);
+        }
     };
 
     void fetchSentenceData();

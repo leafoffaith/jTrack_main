@@ -5,7 +5,7 @@ import { Home, Learn, Login } from './components'
 import HiraganaScheduler from './components/SuperMemo/HiraganaScheduler.tsx'
 import KatakanaScheduler from './components/SuperMemo/KatakanaScheduler.tsx'
 import { createBrowserRouter, RouterProvider, } from 'react-router-dom'
-import './index.css'
+import './styles/globals.css'
 import LearnRouter from './components/Learn/LearnRouter.tsx'
 
 const router = createBrowserRouter([

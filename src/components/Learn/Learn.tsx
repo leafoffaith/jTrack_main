@@ -1,13 +1,18 @@
 import DeckSelect from "../DeckSelect/DeckSelect";
-import Navbar from "../Navbar/Navbar";
 import { supaClient } from "../Client/supaClient";
 import { useEffect, useState } from "react";
 import { Route, Routes } from "react-router-dom";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
+import { Button } from "../ui/button";
+import { Link } from "react-router-dom";
+
+interface Deck {
+    deck_id: number;
+    title: string;
+}
 
 const Learn = () => {
-
-    //state deckData
-    const [deckData, setDeckData] = useState<any[]>([]);
+    const [deckData, setDeckData] = useState<Deck[]>([]);
     const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -18,10 +23,6 @@ const Learn = () => {
     }
 
     const getDecks = async (): Promise<void> => {
-
-        console.log("supaClient:", supaClient);
-
-
         const { data: tempData, error } = await supaClient
             .from('decks')
             .select('*')
@@ -31,13 +32,11 @@ const Learn = () => {
         }
         if (tempData) {
             setDeckData(tempData);
-            console.log(tempData, "deck data");
         }
     }
 
     useEffect(() => {
-        checkAuth();
-        // Listen for auth state changes
+        void checkAuth();
         const { data: { subscription } } = supaClient.auth.onAuthStateChange((_event, session) => {
             setIsAuthenticated(!!session);
         });
@@ -49,47 +48,43 @@ const Learn = () => {
 
     useEffect(() => {
         if (isAuthenticated) {
-            getDecks().catch((error) => {
+            void getDecks().catch((error) => {
                 console.log(error)
             })
         }
     }, [isAuthenticated])
 
-
     if (isLoading) {
         return (
-            <div style={{ width: '100%', maxWidth: '100%', overflow: 'hidden' }}>
-                <div className="header-navbar">
-                    <Navbar />
-                </div>
-                <div style={{ width: '100%', padding: '0 1rem' }}>
-                    <div>Loading...</div>
-                </div>
+            <div className="flex-1 flex items-center justify-center p-4">
+                <div className="text-lg">Loading...</div>
             </div>
         );
     }
 
     if (!isAuthenticated) {
         return (
-            <div style={{ width: '100%', maxWidth: '100%', overflow: 'hidden' }}>
-                <div className="header-navbar">
-                    <Navbar />
-                </div>
-                <div style={{ width: '100%', padding: '0 1rem', textAlign: 'center', marginTop: '2rem' }}>
-                    <h2>Please Login first</h2>
-                </div>
+            <div className="flex-1 flex items-center justify-center p-4">
+                <Card className="max-w-md w-full">
+                    <CardHeader className="text-center">
+                        <CardTitle className="text-2xl">Please Login First</CardTitle>
+                        <CardDescription>You need to be logged in to access your decks and start learning.</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <Link to="/login">
+                            <Button className="w-full" size="lg">
+                                Go to Login
+                            </Button>
+                        </Link>
+                    </CardContent>
+                </Card>
             </div>
         );
     }
 
     return (
-        <div style={{ width: '100%', maxWidth: '100%', overflow: 'hidden' }}>
-            <div className="header-navbar">
-                <Navbar />
-            </div>
-            <div style={{ width: '100%', padding: '0 1rem' }}>
-                <DeckSelect deckList={deckData} />
-            </div>
+        <div className="flex-1 container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <DeckSelect deckList={deckData} />
             <Routes>
                 <Route path="hiragana" element={<div>hiragana</div>} />
                 <Route path="katakana" element={<div>katakana</div>} />

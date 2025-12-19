@@ -112,7 +112,7 @@ export const fetchAvailableHiragana = async (
 
   // Priority 2: No cards are due AND user hasn't studied in 24 hours
   if (!hasStudiedRecently) {
-    // Filter out studied hiragana to get new ones
+  // Filter out studied hiragana to get new ones
     const allNewHiragana = hiragana.filter((h) => !studiedFronts.includes(h.hiragana));
     
     // Limit to 3 new cards per session

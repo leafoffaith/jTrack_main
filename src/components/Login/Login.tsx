@@ -1,18 +1,22 @@
-// import { useState } from 'react';
 import { supaClient } from '../Client/supaClient';
-import { Auth } from '@supabase/auth-ui-react';
 import Navbar from '../Navbar/Navbar';
-import { signUp, signIn, register } from './loginLogic';
+import { signIn, register } from './loginLogic';
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-// import './Login.css';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
+import { Label } from '../ui/label';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+import { BookOpen } from 'lucide-react';
 
 export default function Login() {
+  const [searchParams] = useSearchParams();
+  const isRegisterMode = searchParams.get("mode") === "register";
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
-  const [isRegistering, setIsRegistering] = useState(false);
+  const [mode, setMode] = useState<"login" | "register">(isRegisterMode ? "register" : "login");
   const [error, setError] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -53,7 +57,7 @@ export default function Login() {
     e.preventDefault();
     setError('');
 
-    if (isRegistering) {
+    if (mode === 'register') {
       handleRegister();
     } else {
       handleLogin();
@@ -62,14 +66,11 @@ export default function Login() {
 
   const handleLogin = async () => {
     const { data, error } = await signIn(email, password);
-    console.log(email, password);
     if (error) {
       console.error('Error signing in:', error.message);
       setError(error.message);
     } else {
       console.log('User signed in:', data.user);
-      console.log(data);
-      alert('Login successful!');
       navigate('/learn');
     }
   }
@@ -82,22 +83,23 @@ export default function Login() {
       // If email exists, redirect to login after showing error
       if (error.message.includes('already exists')) {
         setTimeout(() => {
-          setIsRegistering(false);
+          setMode('login');
           setError('');
         }, 2000);
       }
     } else {
       console.log('User registered and logged in:', data?.user);
-      alert('Registration successful!');
       navigate('/learn');
     }
   }
 
   if (isLoading) {
     return (
-      <div>
+      <div className="min-h-screen flex flex-col">
         <Navbar />
-        <div>Loading...</div>
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">Loading...</div>
+        </div>
       </div>
     );
   }
@@ -105,60 +107,104 @@ export default function Login() {
   if (isAuthenticated) {
     // User is already logged in, will be redirected
     return (
-      <div>
+      <div className="min-h-screen flex flex-col">
         <Navbar />
-        <div>Redirecting...</div>
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">Redirecting...</div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div>
+    <div className="min-h-screen flex flex-col">
       <Navbar />
-      <div>
-        <h2>{isRegistering ? 'Register' : 'Login'}</h2>
-        {error && <div style={{ color: 'red', marginBottom: '1rem' }}>{error}</div>}
-        {/* create inputs */}
-        <form onSubmit={handleSubmit}>
-          {isRegistering && (
-            <input
-              type="text"
-              placeholder="Username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              required
-            />
-          )}
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-          <button type="submit">{isRegistering ? 'Register' : 'Log In'}</button>
-        </form>
-        <button 
-          type="button" 
-          onClick={() => {
-            setIsRegistering(!isRegistering);
-            setError('');
-            setEmail('');
-            setPassword('');
-            setUsername('');
-          }}
-          style={{ marginTop: '1rem' }}
-        >
-          {isRegistering ? 'Already have an account? Login' : 'Need an account? Register'}
-        </button>
+
+      <div className="flex-1 flex items-center justify-center p-4 bg-muted/30">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center space-y-2">
+            <div className="flex justify-center mb-4">
+              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+                <BookOpen className="h-6 w-6 text-primary" />
+              </div>
+            </div>
+            <CardTitle className="text-2xl">{mode === "login" ? "Welcome Back" : "Create Your Account"}</CardTitle>
+            <CardDescription>
+              {mode === "login"
+                ? "Enter your credentials to access your account"
+                : "Start your language learning journey today"}
+            </CardDescription>
+          </CardHeader>
+
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {error && (
+                <div className="p-3 rounded-md bg-destructive/10 text-destructive text-sm">
+                  {error}
+                </div>
+              )}
+
+              {mode === "register" && (
+                <div className="space-y-2">
+                  <Label htmlFor="username">Username</Label>
+                  <Input
+                    id="username"
+                    type="text"
+                    placeholder="johndoe"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    required
+                  />
+                </div>
+              )}
+
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="you@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="password">Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+              </div>
+
+              <Button type="submit" className="w-full" size="lg">
+                {mode === "login" ? "Sign In" : "Create Account"}
+              </Button>
+            </form>
+
+            <div className="mt-6 text-center text-sm">
+              <button
+                type="button"
+                onClick={() => {
+                  setMode(mode === "login" ? "register" : "login");
+                  setError('');
+                  setEmail('');
+                  setPassword('');
+                  setUsername('');
+                }}
+                className="text-primary hover:underline"
+              >
+                {mode === "login" ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
+              </button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
-    </div >
-  )
+    </div>
+  );
 }

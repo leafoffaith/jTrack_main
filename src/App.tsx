@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
 import { QueryClient, QueryClientProvider } from 'react-query';
-import './App.css';
 import { supaClient } from './components/Client/supaClient';
 import { Session } from '@supabase/supabase-js';
 

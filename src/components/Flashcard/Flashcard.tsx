@@ -1,149 +1,206 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import FlashcardBack from './FlashcardBack/FlashcardBack';
-import FlashcardFront from './FlashcardFront/FlashcardFront';
+import React from 'react';
+import { Card, CardContent } from '../ui/card';
+import { cn } from '../../lib/utils';
 import { SuperMemoGrade } from 'supermemo';
 
 interface FlashcardProps {
-  front: string;
-  back: string | undefined;
+  front: React.ReactNode;
+  back?: React.ReactNode;
   kanjiBack?: {
-    meaning: [];
-    kun_readings: [];
-    on_readings: [];
-    name_readings: [];
+    meaning: string[];
+    kun_readings: string[];
+    on_readings: string[];
+    name_readings: string[];
     stroke_count: number;
   };
-  flipped?: boolean;
-  setIsFlipped: React.Dispatch<React.SetStateAction<boolean>>;
-  practice?: (grade: SuperMemoGrade) => void;
-  options?: string[];
+  isFlipped?: boolean;
   isDue?: boolean;
+  className?: string;
+  position?: "active" | "queue-1" | "queue-2";
+  isExiting?: boolean;
+  onFlipComplete?: () => void;
+  onFlip?: () => void;
 }
 
-const Flashcard: React.FC<FlashcardProps> = ({
-  options,
-  flipped,
-  setIsFlipped,
-  practice,
+export function Flashcard({
   front,
   back,
   kanjiBack,
-  isDue,
-}) => {
-  const [timer, setTimer] = useState(60);
-  const [flip, setFlip] = useState(false);
-  const [correct, setCorrect] = useState('');
+  isFlipped = false,
+  isDue = false,
+  className,
+  position = "active",
+  isExiting = false,
+  onFlipComplete,
+  onFlip,
+}: FlashcardProps) {
+  const isActive = position === "active";
 
-  useEffect(() => {
-    const countdown = setInterval(() => {
-      setTimer((prevTimer) => prevTimer - 1);
-    }, 1000);
-
-    if (timer === 0) {
-      practice!(1);
-      clearInterval(countdown);
+  const handleCardClick = () => {
+    if (isActive && !isFlipped && onFlip) {
+      onFlip();
     }
-
-    return () => clearInterval(countdown);
-  }, [timer, practice]);
-
-  useEffect(() => {
-    setTimer(60);
-  }, [front, back]);
-
-  const handleBothClicks = () => {
-    setFlip(!flip);
-    setIsFlipped(true);
   };
-
-  const handleButtonClass = (option: string) => {
-    if (option === 'correct') {
-      setCorrect('correctButton');
-    } else if (option === 'incorrect') {
-      setCorrect('incorrectButton');
-    }
-    return 'buttons';
-  };
-
-  const handlePractice = (grade: SuperMemoGrade) => {
-    handleButtonClass(grade === 5 ? 'correct' : 'incorrect');
-    alert(grade === 5 ? 'Correct!' : 'Incorrect!');
-    practice!(grade);
-  };
-
-  const renderButtons = () => {
-    return (
-      primaryArray &&
-      primaryArray.map((option, index) => (
-        <button
-          key={index}
-          onClick={() => handlePractice(option === back ? 5 : 1)}
-          className={correct}
-        >
-          {option}
-        </button>
-      ))
-    );
-  };
-
-  const main = useMemo(() => {
-    if (options) {
-      return [back, ...options];
-    }
-    return [];
-  }, [back, options]);
-
-  const primaryArray = useMemo(() => {
-    if (main.length > 0) {
-      return main.sort(() => Math.random() - 0.5);
-    }
-    return [];
-  }, [main]);
 
   return (
-    <div className="flashcard card">
-      <div>
-        {isDue && (
-          <div style={{
-            padding: '8px 12px',
-            backgroundColor: '#ff9800',
-            color: 'white',
-            borderRadius: '4px 4px 0 0',
-            fontSize: '14px',
-            fontWeight: 'bold',
-            textAlign: 'center',
-            marginBottom: '8px'
-          }}>
-            Due Card
-          </div>
+    <div
+      className={cn(
+        "relative w-full max-w-md mx-auto transition-all duration-300",
+        position === "queue-1" && "scale-95 -translate-y-4 opacity-60 pointer-events-none",
+        position === "queue-2" && "scale-90 -translate-y-8 opacity-30 pointer-events-none",
+        isExiting && "animate-fade-out",
+        className,
+      )}
+      style={{ perspective: "1000px" }}
+    >
+      <div
+        className={cn(
+          "relative w-full transition-transform duration-500 ease-in-out cursor-pointer",
+          isFlipped && "[transform:rotateY(180deg)]",
         )}
-        <div>
-          <FlashcardFront front={front} flipped={flipped} />
-          {options && (
-            <div className="buttons">
-              {renderButtons()}
+        style={{ transformStyle: "preserve-3d" }}
+        onClick={handleCardClick}
+        onTransitionEnd={() => {
+          if (isFlipped && onFlipComplete) {
+            onFlipComplete();
+          }
+        }}
+      >
+        {/* Front of card */}
+        <Card
+          className={cn(
+            "relative overflow-hidden shadow-xl min-h-[320px]",
+            isActive && "shadow-2xl",
+            isFlipped && "invisible",
+          )}
+          style={{
+            backfaceVisibility: "hidden",
+          }}
+        >
+          {/* Due Card Label */}
+          {isDue && isActive && !isFlipped && (
+            <div className="absolute top-0 left-0 right-0 z-10">
+              <div className="bg-accent text-accent-foreground text-xs font-bold px-3 py-1.5 text-center rounded-t-xl">
+                DUE CARD
+              </div>
             </div>
           )}
-          {flipped && (
-            <div>
+
+          <CardContent
+            className={cn("flex items-center justify-center min-h-[320px] p-8", isDue && isActive && "pt-12")}
+          >
+            <div className="text-center space-y-4 w-full">{front}</div>
+          </CardContent>
+        </Card>
+
+        {/* Back of card */}
+        <Card
+          className={cn(
+            "absolute inset-0 overflow-hidden shadow-xl min-h-[320px]",
+            isActive && "shadow-2xl",
+            !isFlipped && "invisible",
+          )}
+          style={{
+            backfaceVisibility: "hidden",
+            transform: "rotateY(180deg)",
+          }}
+        >
+          {/* Due Card Label */}
+          {isDue && isActive && isFlipped && (
+            <div className="absolute top-0 left-0 right-0 z-10">
+              <div className="bg-accent text-accent-foreground text-xs font-bold px-3 py-1.5 text-center rounded-t-xl">
+                DUE CARD
+              </div>
+            </div>
+          )}
+
+          <CardContent
+            className={cn("flex items-center justify-center min-h-[320px] p-8", isDue && isActive && "pt-12")}
+          >
+            <div className="text-center space-y-4 w-full">
               {kanjiBack ? (
-                <FlashcardBack front={front} kanjiBack={kanjiBack} />
+                <KanjiCard
+                  kanji={front as string}
+                  meaning={kanjiBack.meaning.join(', ')}
+                  onReading={kanjiBack.on_readings.join(', ')}
+                  kunReading={kanjiBack.kun_readings.join(', ')}
+                />
               ) : (
-                <FlashcardBack back={back} />
+                back
               )}
-              <button onClick={() => handlePractice(5)}>Easy</button>
-              <button onClick={() => handlePractice(3)}>Medium</button>
-              <button onClick={() => handlePractice(1)}>Hard</button>
             </div>
-          )}
-          {!options && !flipped && (
-            <button onClick={() => handleBothClicks()}>Show answer</button>
-          )}
-        </div>
-        <div>Time left: {timer} seconds</div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
-};
+}
+
+// Specialized card content components
+export function HiraganaCard({ character, romaji }: { character: string; romaji: string }) {
+  return (
+    <>
+      <div className="text-8xl font-bold">{character}</div>
+      {romaji && <div className="text-2xl text-muted-foreground">{romaji}</div>}
+    </>
+  );
+}
+
+export function KatakanaCard({ character, romaji }: { character: string; romaji: string }) {
+  return (
+    <>
+      <div className="text-8xl font-bold">{character}</div>
+      {romaji && <div className="text-2xl text-muted-foreground">{romaji}</div>}
+    </>
+  );
+}
+
+export function KanjiCard({
+  kanji,
+  meaning,
+  onReading,
+  kunReading,
+  examples,
+}: {
+  kanji: string;
+  meaning: string;
+  onReading?: string;
+  kunReading?: string;
+  examples?: string[];
+}) {
+  return (
+    <div className="space-y-6 w-full">
+      <div className="text-7xl font-bold">{kanji}</div>
+      <div className="space-y-4 text-left max-w-sm mx-auto">
+        <div>
+          <p className="text-sm text-muted-foreground">Meaning</p>
+          <p className="text-lg font-semibold">{meaning}</p>
+        </div>
+        {onReading && (
+          <div>
+            <p className="text-sm text-muted-foreground">On Reading</p>
+            <p className="text-lg">{onReading}</p>
+          </div>
+        )}
+        {kunReading && (
+          <div>
+            <p className="text-sm text-muted-foreground">Kun Reading</p>
+            <p className="text-lg">{kunReading}</p>
+          </div>
+        )}
+        {examples && examples.length > 0 && (
+          <div>
+            <p className="text-sm text-muted-foreground">Examples</p>
+            <ul className="text-sm space-y-1">
+              {examples.map((ex, i) => (
+                <li key={i}>{ex}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
 export default Flashcard;
