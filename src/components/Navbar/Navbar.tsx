@@ -71,7 +71,11 @@ const Navbar = () => {
           <div className="flex items-center gap-4">
             {isAuthenticated ? (
               <>
-                <span className="text-sm text-muted-foreground hidden sm:inline">{username}</span>
+                <Link to="/profile">
+                  <Button className="bg-primary hover:bg-primary/90 text-primary-foreground" size="sm">
+                    Profile
+                  </Button>
+                </Link>
                 <Button variant="outline" onClick={() => void signOut()} size="sm">
                   Sign Out
                 </Button>

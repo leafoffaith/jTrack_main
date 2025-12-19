@@ -3,6 +3,7 @@ import { FlashcardItem } from "../Flashcard/FlashcardItem";
 import dayjs from "dayjs";
 import { getNumericUserId } from "../Client/userIdHelper";
 import { checkUserHasStudiedRecently, updateUserHasStudied, getUserHasStudied } from "../Client/userStudyHelper";
+import { getNewCardsShownToday } from "../Client/sessionHelper";
 
 interface HiraganaItem {
   hiragana: string;
@@ -105,34 +106,48 @@ export const fetchAvailableHiragana = async (
       due_date: card.due_date,
     }));
 
-  // If there are due cards, show ONLY those (limit to 3 total per session)
+  // If there are due cards, show all due cards (no limit, they need to be reviewed)
   if (dueFlashcards.length > 0) {
-    return { cards: dueFlashcards.slice(0, 3) };
+    return { cards: dueFlashcards };
   }
 
-  // Priority 2: No cards are due AND user hasn't studied in 24 hours
-  if (!hasStudiedRecently) {
+  // Priority 2: No cards are due - check for new cards
   // Filter out studied hiragana to get new ones
-    const allNewHiragana = hiragana.filter((h) => !studiedFronts.includes(h.hiragana));
-    
-    // Limit to 3 new cards per session
-    const newHiragana = allNewHiragana.slice(0, 3).map((h) => ({
-      front: h.hiragana,
-      back: h.romaji,
-      interval: 1,
-      repetition: 0,
-      efactor: 2.5,
-      due_date: dayjs().toISOString(),
-    }));
-
-    return { cards: newHiragana };
+  const allNewHiragana = hiragana.filter((h) => !studiedFronts.includes(h.hiragana));
+  
+  // Check how many new cards have been shown today using session storage
+  const newCardsShownToday = getNewCardsShownToday('hiragana');
+  
+  // If we've already shown 3 new cards today, no more for today
+  if (newCardsShownToday.length >= 3) {
+    return { 
+      cards: [],
+      message: "You have finished studying for now! Come back tomorrow for more cards :)"
+    };
   }
 
-  // Priority 3: User has studied within 24 hours AND no cards are due
-  return { 
-    cards: [],
-    message: "You have finished studying for now! Come back later :)"
-  };
+  // Filter out cards that were already shown today
+  const availableNewHiragana = allNewHiragana.filter((h) => !newCardsShownToday.includes(h.hiragana));
+  
+  // Show up to 3 new cards (or less if we've already shown some today)
+  const remainingNewCards = 3 - newCardsShownToday.length;
+  const newHiragana = availableNewHiragana.slice(0, remainingNewCards).map((h) => ({
+    front: h.hiragana,
+    back: h.romaji,
+    interval: 1,
+    repetition: 0,
+    efactor: 2.5,
+    due_date: dayjs().toISOString(),
+  }));
+
+  if (newHiragana.length === 0) {
+    return { 
+      cards: [],
+      message: "You have finished studying for now! Come back tomorrow for more cards :)"
+    };
+  }
+
+  return { cards: newHiragana };
 };
 
 // Removed updateFlashcard - hiragana table columns are read-only/generated

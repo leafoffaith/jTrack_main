@@ -4,6 +4,9 @@ import App from './App.tsx'
 import { Home, Learn, Login } from './components'
 import HiraganaScheduler from './components/SuperMemo/HiraganaScheduler.tsx'
 import KatakanaScheduler from './components/SuperMemo/KatakanaScheduler.tsx'
+import KanjiScheduler from './components/SuperMemo/KanjiScheduler.tsx'
+import SentenceScheduler from './components/SuperMemo/SentenceScheduler.tsx'
+import Profile from './components/Profile/Profile.tsx'
 import { createBrowserRouter, RouterProvider, } from 'react-router-dom'
 import './styles/globals.css'
 import LearnRouter from './components/Learn/LearnRouter.tsx'
@@ -28,6 +31,21 @@ const router = createBrowserRouter([
       {
         path: '/learn/katakana',
         element: <KatakanaScheduler />,
+        errorElement: <div>Not Found</div>,
+      },
+      {
+        path: '/learn/kanji',
+        element: <KanjiScheduler />,
+        errorElement: <div>Not Found</div>,
+      },
+      {
+        path: '/learn/sentence',
+        element: <SentenceScheduler />,
+        errorElement: <div>Not Found</div>,
+      },
+      {
+        path: '/profile',
+        element: <Profile />,
         errorElement: <div>Not Found</div>,
       },
     ]

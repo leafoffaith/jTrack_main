@@ -1,5 +1,6 @@
 import { supaClient } from '../Client/supaClient';
 import Navbar from '../Navbar/Navbar';
+import ScrollToTop from '../ScrollToTop/ScrollToTop';
 import { signIn, register } from './loginLogic';
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -97,6 +98,7 @@ export default function Login() {
     return (
       <div className="min-h-screen flex flex-col">
         <Navbar />
+        <ScrollToTop />
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">Loading...</div>
         </div>
@@ -109,6 +111,7 @@ export default function Login() {
     return (
       <div className="min-h-screen flex flex-col">
         <Navbar />
+        <ScrollToTop />
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">Redirecting...</div>
         </div>
@@ -119,6 +122,7 @@ export default function Login() {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
+      <ScrollToTop />
 
       <div className="flex-1 flex items-center justify-center p-4 bg-muted/30">
         <Card className="w-full max-w-md">

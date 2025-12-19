@@ -1,5 +1,6 @@
 import { Outlet, useLocation, Link } from "react-router-dom";
 import Navbar from "../Navbar/Navbar";
+import ScrollToTop from "../ScrollToTop/ScrollToTop";
 import { Button } from "../ui/button";
 import { Card, CardContent } from "../ui/card";
 import { Brain, Clock, TrendingUp, Layers } from "lucide-react";
@@ -30,6 +31,7 @@ const Home = () => {
     return (
         <div className="min-h-screen flex flex-col">
             <Navbar />
+            <ScrollToTop />
 
             {isHomePage ? (
                 <>
@@ -41,7 +43,7 @@ const Home = () => {
                                     Master Japanese with <span className="text-primary">Spaced Repetition</span>
                                 </h1>
                                 <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto text-pretty">
-                                    Learn faster and remember longer with scientifically-proven spaced repetition. Our SuperMemo 2 algorithm
+                                    Learn faster and remember longer with scientifically-proven spaced repetition. Our algorithm, based on SuperMemo 2,
                                     schedules reviews right before you forget, optimizing your study time for maximum retention.
                                 </p>
                             </div>

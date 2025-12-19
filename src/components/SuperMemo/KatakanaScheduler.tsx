@@ -11,7 +11,7 @@ import { ArrowLeft, CheckCircle2 } from 'lucide-react';
 import { supaClient } from '../Client/supaClient';
 import { useAuth } from '../Client/useAuth';
 import { getNumericUserId } from '../Client/userIdHelper';
-import { initializeSession } from '../Client/sessionHelper';
+import { initializeSession, markNewCardShown } from '../Client/sessionHelper';
 
 interface UpdatedFlashcard extends FlashcardItem {
   due_date: string;
@@ -69,6 +69,12 @@ const KatakanaScheduler = (): JSX.Element => {
 
     const currentFlashcard = katakanaData[currentCardIndex];
     if (!currentFlashcard) return;
+
+    // Mark this card as shown today if it's a new card (no due_date or due_date is today)
+    const isNewCard = !currentFlashcard.due_date || dayjs(currentFlashcard.due_date).isSame(dayjs(), 'day');
+    if (isNewCard) {
+      markNewCardShown('katakana', currentFlashcard.front);
+    }
 
     const updatedFlashcard = practiceFlashcard(currentFlashcard, grade);
 
@@ -174,6 +180,7 @@ const KatakanaScheduler = (): JSX.Element => {
   };
 
   const isDue = currentFlashcard && isFlashcardDue(currentFlashcard.due_date);
+  const isNew = currentFlashcard && (!currentFlashcard.due_date || dayjs(currentFlashcard.due_date).isSame(dayjs(), 'day'));
 
   useEffect(() => {
     setIsFlipped(false);
@@ -258,6 +265,7 @@ const KatakanaScheduler = (): JSX.Element => {
                 back={<KatakanaCard character={currentFlashcard.front} romaji={currentFlashcard.back || ''} />}
                 isFlipped={isFlipped}
                 isDue={isDue}
+                isNew={isNew && !isDue}
                 position="active"
                 isExiting={isExiting}
                 onFlip={handleFlip}

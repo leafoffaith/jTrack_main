@@ -1,7 +1,6 @@
 import React from 'react';
 import { Card, CardContent } from '../ui/card';
 import { cn } from '../../lib/utils';
-import { SuperMemoGrade } from 'supermemo';
 
 interface FlashcardProps {
   front: React.ReactNode;
@@ -15,6 +14,7 @@ interface FlashcardProps {
   };
   isFlipped?: boolean;
   isDue?: boolean;
+  isNew?: boolean;
   className?: string;
   position?: "active" | "queue-1" | "queue-2";
   isExiting?: boolean;
@@ -28,6 +28,7 @@ export function Flashcard({
   kanjiBack,
   isFlipped = false,
   isDue = false,
+  isNew = false,
   className,
   position = "active",
   isExiting = false,
@@ -77,17 +78,20 @@ export function Flashcard({
             backfaceVisibility: "hidden",
           }}
         >
-          {/* Due Card Label */}
-          {isDue && isActive && !isFlipped && (
+          {/* Due/New Card Label */}
+          {isActive && !isFlipped && (isDue || isNew) && (
             <div className="absolute top-0 left-0 right-0 z-10">
-              <div className="bg-accent text-accent-foreground text-xs font-bold px-3 py-1.5 text-center rounded-t-xl">
-                DUE CARD
+              <div className={cn(
+                "text-xs font-bold px-3 py-1.5 text-center rounded-t-xl",
+                isDue ? "bg-accent text-accent-foreground" : "bg-primary text-primary-foreground"
+              )}>
+                {isDue ? "DUE CARD" : "NEW CARD"}
               </div>
             </div>
           )}
 
           <CardContent
-            className={cn("flex items-center justify-center min-h-[320px] p-8", isDue && isActive && "pt-12")}
+            className={cn("flex items-center justify-center min-h-[320px] p-8", (isDue || isNew) && isActive && "pt-12")}
           >
             <div className="text-center space-y-4 w-full">{front}</div>
           </CardContent>
@@ -105,17 +109,20 @@ export function Flashcard({
             transform: "rotateY(180deg)",
           }}
         >
-          {/* Due Card Label */}
-          {isDue && isActive && isFlipped && (
+          {/* Due/New Card Label */}
+          {isActive && isFlipped && (isDue || isNew) && (
             <div className="absolute top-0 left-0 right-0 z-10">
-              <div className="bg-accent text-accent-foreground text-xs font-bold px-3 py-1.5 text-center rounded-t-xl">
-                DUE CARD
+              <div className={cn(
+                "text-xs font-bold px-3 py-1.5 text-center rounded-t-xl",
+                isDue ? "bg-accent text-accent-foreground" : "bg-primary text-primary-foreground"
+              )}>
+                {isDue ? "DUE CARD" : "NEW CARD"}
               </div>
             </div>
           )}
 
           <CardContent
-            className={cn("flex items-center justify-center min-h-[320px] p-8", isDue && isActive && "pt-12")}
+            className={cn("flex items-center justify-center min-h-[320px] p-8", (isDue || isNew) && isActive && "pt-12")}
           >
             <div className="text-center space-y-4 w-full">
               {kanjiBack ? (
