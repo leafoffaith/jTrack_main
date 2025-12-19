@@ -103,11 +103,5 @@ npm run test:ui
 -   `src/test`: Test configurations and setup.
 -   `supabase`: Supabase related configurations.
 
-## 🚢 Deployment
-
-For full deployment instructions, including database schema and production configuration, please refer to [DEPLOYMENT_PLAN.md](./DEPLOYMENT_PLAN.md).
-
-The app is ready to be deployed to platforms like **Vercel** or **Netlify**.
-
 ---
 *Created by Shaurya Dey*
