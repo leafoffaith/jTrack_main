@@ -1,7 +1,12 @@
-import React from 'react';
-
-const renderButtons = (options, back, handlePractice1, handlePractice5) => {
-  return options.map((option, index) => {
+// This file is not currently used but kept for potential future use
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const renderButtons = (
+  options: string[],
+  back: string,
+  handlePractice1: () => void,
+  handlePractice5: () => void
+) => {
+  return options.map((option: string, index: number) => {
     if (option === back) {
       return (
         <button key={index} onClick={handlePractice5}>

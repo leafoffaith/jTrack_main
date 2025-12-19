@@ -113,10 +113,10 @@ export const fetchKanjiByLevel = async (level: string) => {
          * if readings array empty then display none
          */
         kanjiBack: {
-          meaning: kanjiData.meanings[0],
-          kun_readings: kanjiData.kun_readings,
-          on_readings: kanjiData.on_readings,
-          name_readings: kanjiData.name_readings,
+          meaning: kanjiData.meanings && kanjiData.meanings.length > 0 ? [kanjiData.meanings[0]] : [],
+          kun_readings: kanjiData.kun_readings || [],
+          on_readings: kanjiData.on_readings || [],
+          name_readings: kanjiData.name_readings || [],
           stroke_count: kanjiData.stroke_count,
         },
         interval: 0,

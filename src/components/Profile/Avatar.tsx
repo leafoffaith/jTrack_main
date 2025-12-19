@@ -1,15 +1,21 @@
 import { useEffect, useState } from 'react'
 import { supaClient } from '../Client/supaClient'
 
-export default function Avatar({ url, size, onUpload }) {
-  const [avatarUrl, setAvatarUrl] = useState(null)
+interface AvatarProps {
+  url: string | null;
+  size: number;
+  onUpload: (event: React.ChangeEvent<HTMLInputElement>, filePath: string) => void;
+}
+
+export default function Avatar({ url, size, onUpload }: AvatarProps) {
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
   const [uploading, setUploading] = useState(false)
 
   useEffect(() => {
     if (url) downloadImage(url)
   }, [url])
 
-  async function downloadImage(path) {
+  async function downloadImage(path: string) {
     try {
       const { data, error } = await supaClient.storage.from('avatars').download(path)
       if (error) {
@@ -18,11 +24,12 @@ export default function Avatar({ url, size, onUpload }) {
       const url = URL.createObjectURL(data)
       setAvatarUrl(url)
     } catch (error) {
-      console.log('Error downloading image: ', error.message)
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      console.log('Error downloading image: ', errorMessage)
     }
   }
 
-  async function uploadAvatar(event) {
+  async function uploadAvatar(event: React.ChangeEvent<HTMLInputElement>) {
     try {
       setUploading(true)
 
@@ -43,7 +50,8 @@ export default function Avatar({ url, size, onUpload }) {
 
       onUpload(event, filePath)
     } catch (error) {
-      alert(error.message)
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      alert(errorMessage)
     } finally {
       setUploading(false)
     }

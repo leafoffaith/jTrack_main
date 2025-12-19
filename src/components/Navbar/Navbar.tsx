@@ -5,7 +5,6 @@ import { supaClient } from "../Client/supaClient";
 import { useEffect, useState } from "react";
 
 const Navbar = () => {
-  const [username, setUsername] = useState<string | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
@@ -13,12 +12,8 @@ const Navbar = () => {
       const { data: { session } } = await supaClient.auth.getSession();
       if (session?.user) {
         setIsAuthenticated(true);
-        // Get username from user metadata (stored during registration)
-        const usernameFromMetadata = session.user.user_metadata?.username;
-        setUsername(usernameFromMetadata || session.user.email || null);
       } else {
         setIsAuthenticated(false);
-        setUsername(null);
       }
     };
 
@@ -28,12 +23,8 @@ const Navbar = () => {
     const { data: { subscription } } = supaClient.auth.onAuthStateChange((_event, session) => {
       if (session?.user) {
         setIsAuthenticated(true);
-        // Get username from user metadata
-        const usernameFromMetadata = session.user.user_metadata?.username;
-        setUsername(usernameFromMetadata || session.user.email || null);
       } else {
         setIsAuthenticated(false);
-        setUsername(null);
       }
     });
 

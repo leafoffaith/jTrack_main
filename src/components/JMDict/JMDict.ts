@@ -23,25 +23,24 @@
 //CODE STARTS HERE
 
 //IMPORTS
-import data from './tatoeba.json'
-import { FlashcardItem } from "../Flashcard/FlashcardItem"
-import dayjs from "dayjs"
-
-
+import data from "./tatoeba.json";
+import { FlashcardItem } from "../Flashcard/FlashcardItem";
+import dayjs from "dayjs";
 
 //define interface for dictionary
 interface Dict {
   [key: string]: string;
 }
 
-//interface for flashcard with options object
-interface FlashcardWithOptions {
-  flashcard: FlashcardItem,
-  options: string[]
-}
+//interface for flashcard with options object (unused but kept for potential future use)
+// @ts-ignore - unused type kept for potential future use
+type _FlashcardWithOptions = {
+  flashcard: FlashcardItem;
+  options: string[];
+};
 
 //init state as a dictionary
-const dict: Dict = {} as Dict
+const dict: Dict = {} as Dict;
 
 /**
  * @returns a promise that resolves when the JSON data is read into the dictionary
@@ -55,7 +54,7 @@ const readJSON = async () => {
     try {
       for (let i = 0; i < data.length; i++) {
         //ts-ignore because typescript doesn't like it when you try to index an array with a string
-        dict[data[i][1]] = data[i][3];
+        dict[data[i][1]] = String(data[i][3]);
       }
       resolve(); // Resolve the promise after the loop completes
     } catch (error) {
@@ -67,38 +66,34 @@ const readJSON = async () => {
 /**
  * Create a function that returns three alternate sentences from the dictionary to show
  * as multiple choice options. Ensure that the three random options are not the same as the key being provided.
-  * @param randomKey the key of the sentence that is the correct answer and has already been shown
-  * @returns an array of 3 alternate sentences
-  * @throws an error if the JSON data cannot be read into the dictionary
-  * @async
+ * @param randomKey the key of the sentence that is the correct answer and has already been shown
+ * @returns an array of 3 alternate sentences
+ * @throws an error if the JSON data cannot be read into the dictionary
+ * @async
  */
 
 export const createMultipleChoiceOptions = async (passedKey: string) => {
-  const options: string[] = []
+  const options: string[] = [];
   try {
     await readJSON();
     //create 3 random options
     for (let i = 0; i < 3; i++) {
       //get a random key from the dictionary
-      const keys = Object.keys(dict)
-      let randomKey = keys[Math.floor(Math.random() * keys.length)]
+      const keys = Object.keys(dict);
+      let randomKey = keys[Math.floor(Math.random() * keys.length)];
       //check if the key is the same as the randomKey
       while (randomKey === passedKey) {
         //if it is, get another random key
-        randomKey = keys[Math.floor(Math.random() * keys.length)]
+        randomKey = keys[Math.floor(Math.random() * keys.length)];
       }
       //push the random key to the options array
-      options.push(dict[randomKey])
+      options.push(dict[randomKey]);
     }
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
-  return options
-}
-
-
-
-
+  return options;
+};
 
 /**
  * @returns an array of 10 flashcards created from the dictionary
@@ -109,34 +104,34 @@ export const createMultipleChoiceOptions = async (passedKey: string) => {
 
 //create 10 new flashcards from the dictionary
 export const createSentenceFlashcards = async () => {
-const flashcards: FlashcardItem[] = []
+  const flashcards: FlashcardItem[] = [];
 
   try {
     await readJSON();
     //array to store flashcard items
     //create 10 flashcards
-  for (let i = 0; i < 10; i++) {
-    //get a random key from the dictionary
-    const keys = Object.keys(dict)
-    const randomKey = keys[Math.floor(Math.random() * keys.length)]
-    //create flashcard item
-    const flashcard: FlashcardItem = {
-      front: randomKey,
-      back: dict[randomKey],
-      interval: 0,
-      repetition: 0,
-      efactor: 2.5,
-      dueDate: dayjs().toISOString(),
+    for (let i = 0; i < 10; i++) {
+      //get a random key from the dictionary
+      const keys = Object.keys(dict);
+      const randomKey = keys[Math.floor(Math.random() * keys.length)];
+      //create flashcard item
+      const flashcard: FlashcardItem = {
+        front: randomKey,
+        back: dict[randomKey],
+        interval: 0,
+        repetition: 0,
+        efactor: 2.5,
+        due_date: dayjs().toISOString(),
+      };
+      //generate 3 random options that are the incorrect answers
+
+      //add flashcard item to flashcards array
+      flashcards.push(flashcard);
+      //push the 3 options to the flashcard item
     }
-    //generate 3 random options that are the incorrect answers
-   
-    //add flashcard item to flashcards array
-    flashcards.push(flashcard)
-    //push the 3 options to the flashcard item
-  }
-    } catch (error) {
-      console.log(error) 
+  } catch (error) {
+    console.log(error);
   }
 
   return flashcards;
-} 
+};

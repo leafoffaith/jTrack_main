@@ -8,7 +8,7 @@
 
 import axios from 'axios';
 
-export const getHint1 = async (text) => {
+export const getHint1 = async (text: string): Promise<string> => {
     const response = await axios.get('http://localhost:3001/api/kuroshiro', {
         params: {
         text: text

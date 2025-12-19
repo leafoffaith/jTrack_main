@@ -3,7 +3,6 @@ import { FlashcardItem } from "../Flashcard/FlashcardItem";
 import dayjs from "dayjs";
 import { getNumericUserId } from "../Client/userIdHelper";
 import { checkUserHasStudiedRecently, updateUserHasStudied } from "../Client/userStudyHelper";
-import { getNewCardsShownToday } from "../Client/sessionHelper";
 
 interface KatakanaItem {
   front: string;

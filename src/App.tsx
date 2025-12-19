@@ -1,38 +1,31 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { supaClient } from './components/Client/supaClient';
 import { Session } from '@supabase/supabase-js';
 
-const LOCAL_SESSION_KEY = 'sb_minimal_session_v1';
-
 function App() {
   const [, setSession] = useState<Session | null>(null);
-  const expiryTimerRef = useRef<number | null>(null);
 
   //helper: persist minimal session to avoid storing raw access/refresh tokens
-  const persistMinimalSession = (s: Session | null) => {
-    if (!s) {
-      localStorage.removeItem(LOCAL_SESSION_KEY);
-      return;
-    }
-    const minimal = {
-      userId: s.user?.id,
-      expieres_at: s.expires_at ?? null,
-    };
-    localStorage.setItem(LOCAL_SESSION_KEY, JSON.stringify(minimal))
-  }
+  // const _persistMinimalSession = (s: Session | null) => {
+  //   if (!s) {
+  //     localStorage.removeItem(LOCAL_SESSION_KEY);
+  //     return;
+  //   }
+  //   const minimal = {
+  //     userId: s.user?.id,
+  //     expieres_at: s.expires_at ?? null,
+  //   };
+  //   localStorage.setItem(LOCAL_SESSION_KEY, JSON.stringify(minimal))
+  // }
 
   //clear timer
-  const clearTimer = () => {
-    if (expiryTimerRef.current != null) {
-      window.clearTimeout(expiryTimerRef.current);
-      expiryTimerRef.current = null;
-    }
-  }
-
-  // Use persistMinimalSession and clearTimer if needed
-  void persistMinimalSession;
-  void clearTimer;
+  // const _clearTimer = () => {
+  //   if (expiryTimerRef.current != null) {
+  //     window.clearTimeout(expiryTimerRef.current);
+  //     expiryTimerRef.current = null;
+  //   }
+  // }
 
   //schedule expiry handler
 

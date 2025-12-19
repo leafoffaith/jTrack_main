@@ -4,11 +4,9 @@
  */
 
 
-import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip } from 'recharts';
 
 const StatsPage = () => {
-
-const data = [{name: 'Page A', uv: 400, pv: 2400, amt: 2400}, {name: 'Page B', uv: 300, pv: 4567, amt: 2400}, {name: 'Page C', uv: 200, pv: 1398, amt: 2400}, {name: 'Page D', uv: 278, pv: 9800, amt: 2400}, {name: 'Page E', uv: 189, pv: 3908, amt: 2400}, {name: 'Page F', uv: 239, pv: 4800, amt: 2400}, {name: 'Page G', uv: 349, pv: 4300, amt: 2400}];
 // Data for user upcoming reviews not more than 7 days in the future and not more than 50 reviews per user
 const reviewData = [{
     name: '21/09',

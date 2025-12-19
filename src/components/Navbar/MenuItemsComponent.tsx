@@ -1,5 +1,5 @@
-import Dropdown from "./Dropdown/Dropdown";
 import { Link } from "react-router-dom";
+import React from "react";
 
 //define what the props are
 interface MenuItemsProps {

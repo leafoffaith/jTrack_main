@@ -1,4 +1,3 @@
-import dayjs from 'dayjs';
 
 /**
  * Get the current session date in IST (Indian Standard Time)

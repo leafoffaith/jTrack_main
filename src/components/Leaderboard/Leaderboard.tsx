@@ -8,13 +8,13 @@ interface leaderboardItem {
     words_mastered: number,
     kanji_mastered: number,
     study_streak: number,
-    primary_user_data?: []
+    primary_user_data?: Array<{ user_data_id: number; name: string }>
 }
 
 
 const Leaderboard = () => {
 
-    const [leaderboard, setLeaderboard] = useState([]);
+    const [leaderboard, setLeaderboard] = useState<leaderboardItem[]>([]);
 
        async function getLeaderboard(filter: string) {
             const {data: testData, error } = await supaClient.from('User_study_data').select(`
@@ -76,7 +76,7 @@ const Leaderboard = () => {
                             return (
                                 <tr key={index}>
                                     <td>{index + 1}</td>
-                                    <td>{item.primary_user_data[0].name}</td>
+                                    <td>{item.primary_user_data?.[0]?.name || 'N/A'}</td>
                                     <td>{item.study_streak}</td>
                                     <td>{item.words_mastered}</td>
                                     <td>{item.kanji_mastered}</td>

@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import Navbar from "../Navbar/Navbar";
 
-const Sentences = (props: any) => {
+const Sentences = () => {
 
    const kArray = ['N5', 'N4', 'N3'];
         

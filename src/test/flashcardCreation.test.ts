@@ -1,7 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { createHiraganaFlashcards } from '../components/Fetching/useHiraganaFetch';
 import { createKatakanaFlashcards } from '../components/Fetching/useKatakanaFetch';
-import { FlashcardItem } from '../components/Flashcard/FlashcardItem';
 import { supaClient } from '../components/Client/supaClient';
 
 // Mock Supabase client

@@ -12,8 +12,6 @@ const FlashcardFront: React.FC<FlashcardFrontProps> = ({ front, flipped }) => {
 
   //state for converted kanji
   const [sent, setSent] = useState('');
-  //state for button visibility
-  const [buttonVis, setButtonVis] = useState(true);
   //state for visibility of hint button
   const [hintButton, setHintButton] = useState(true);
 
@@ -27,7 +25,6 @@ const FlashcardFront: React.FC<FlashcardFrontProps> = ({ front, flipped }) => {
   const hint = () => {
     getHint1(front).then((res) => {
       setSent(res);
-      setButtonVis(false);
     }
     ).catch((err) => {
       console.log(err);
@@ -47,9 +44,8 @@ const FlashcardFront: React.FC<FlashcardFrontProps> = ({ front, flipped }) => {
   }
     , [front]);
 
-  //reset button visibility when front changes
+  //reset sent when front changes
   useEffect(() => {
-    setButtonVis(true);
     setSent('');  
   }
   , [front]);

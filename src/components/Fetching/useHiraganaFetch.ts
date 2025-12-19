@@ -2,7 +2,7 @@ import { supaClient } from "../Client/supaClient";
 import { FlashcardItem } from "../Flashcard/FlashcardItem";
 import dayjs from "dayjs";
 import { getNumericUserId } from "../Client/userIdHelper";
-import { checkUserHasStudiedRecently, updateUserHasStudied, getUserHasStudied } from "../Client/userStudyHelper";
+import { checkUserHasStudiedRecently, updateUserHasStudied } from "../Client/userStudyHelper";
 import { getNewCardsShownToday } from "../Client/sessionHelper";
 
 interface HiraganaItem {

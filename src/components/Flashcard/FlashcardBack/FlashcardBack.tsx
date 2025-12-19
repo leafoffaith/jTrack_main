@@ -21,17 +21,31 @@ interface FlashcardBackProps {
   
   const FlashcardBack: React.FC<FlashcardBackProps> = ({ back, kanjiBack, front }) => {
     //split and join readings with commas and give each a different color
-    let kunReadings, onReadings, nameReadings = '';
-    kanjiBack?.kun_readings[0] ?  kunReadings = kanjiBack?.kun_readings.join(', ') :  kunReadings = 'no readings to remember';
-    kanjiBack?.on_readings[0] ?  onReadings = kanjiBack?.on_readings.join(', ') :  onReadings = 'no readings to remember';
-    kanjiBack?.name_readings[0] ?  nameReadings = kanjiBack?.name_readings.join(', ') :  nameReadings = 'no readings to remember';
+    let kunReadings = '';
+    let onReadings = '';
+    let nameReadings = '';
+    if (kanjiBack?.kun_readings && kanjiBack.kun_readings.length > 0) {
+      kunReadings = kanjiBack.kun_readings.join(', ');
+    } else {
+      kunReadings = 'no readings to remember';
+    }
+    if (kanjiBack?.on_readings && kanjiBack.on_readings.length > 0) {
+      onReadings = kanjiBack.on_readings.join(', ');
+    } else {
+      onReadings = 'no readings to remember';
+    }
+    if (kanjiBack?.name_readings && kanjiBack.name_readings.length > 0) {
+      nameReadings = kanjiBack.name_readings.join(', ');
+    } else {
+      nameReadings = 'no readings to remember';
+    }
 
       return (
         <div>
           {/* if kanjiback exists render that if not then just render back as usual */}
           {kanjiBack ?
           <div>
-            <p>Meaning: {kanjiBack.meaning}</p>
+            <p>Meaning: {kanjiBack.meaning.join(', ')}</p>
             <p>Kun readings: {kunReadings}</p>
             <p>On readings: {onReadings}</p>
             <p>Name readings: {nameReadings}</p>

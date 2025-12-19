@@ -1,6 +1,5 @@
 import { supaClient } from "../Client/supaClient";
 import { FlashcardItem } from "../Flashcard/FlashcardItem";
-import dayjs from "dayjs";
 import { getNumericUserId } from "../Client/userIdHelper";
 
 interface StudiedFlashcard extends FlashcardItem {

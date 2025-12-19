@@ -1,10 +1,10 @@
 import { supaClient } from "../Client/supaClient";
 
-const fetchDeckList = async ({ queryKey }) => {
+const fetchDeckList = async ({ queryKey }: { queryKey: string }) => {
     
     const query = queryKey;
 
-    const { data: dataDecks, error } = await supaClient
+    const { data: dataDecks } = await supaClient
     .from(query)
     .select('title')
 

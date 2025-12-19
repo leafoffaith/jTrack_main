@@ -65,7 +65,7 @@ const DeckSelect: React.FC<DeckSelectProps> = ({ deckList }): JSX.Element => {
         const deckType = deck.title.split(' ')[0].toLowerCase();
         
         // Fetch due cards count
-        const { data: dueCards, error: dueError } = await supaClient
+        const { data: dueCards } = await supaClient
           .from('studied_flashcards')
           .select('id')
           .eq('user_id', numericUserId)
@@ -73,7 +73,7 @@ const DeckSelect: React.FC<DeckSelectProps> = ({ deckList }): JSX.Element => {
           .lte('due_date', today);
 
         // Fetch studied cards for this user/deck
-        const { data: studiedCards, error: studiedError } = await supaClient
+        const { data: studiedCards } = await supaClient
           .from('studied_flashcards')
           .select('front')
           .eq('user_id', numericUserId)
@@ -82,7 +82,7 @@ const DeckSelect: React.FC<DeckSelectProps> = ({ deckList }): JSX.Element => {
         // Fetch total cards in this deck
         let totalCards = 0;
         if (deckType === 'hiragana' || deckType === 'katakana') {
-          const { data: allCards, error: allError } = await supaClient
+          const { data: allCards } = await supaClient
             .from(deckType)
             .select('id');
           totalCards = allCards?.length || 0;
