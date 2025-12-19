@@ -4,15 +4,15 @@
  * @Purpose This component renders the back of the flashcard but it will be hidden until the user clicks on show answer
 */
 
-import React, { useState } from 'react';
+import React from 'react';
 
 interface FlashcardBackProps {
        back?: string;
        kanjiBack?: {
-        meaning: [],
-        kun_readings: [],
-        on_readings: [],
-        name_readings: [],
+        meaning: string[];
+        kun_readings: string[];
+        on_readings: string[];
+        name_readings: string[];
         stroke_count: number
        }
        options?: string[];

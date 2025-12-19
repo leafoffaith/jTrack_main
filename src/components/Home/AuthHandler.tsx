@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate, Route, Routes } from 'react-router-dom';
+import { useNavigate, Route } from 'react-router-dom';
 import { supaClient } from '../Client/supaClient';
-import {Learn, Login, Kanji, Scheduler} from '../index.tsx';
+import {Learn, Kanji, Scheduler} from '../index.tsx';
 
 // Define the protected routes that should only be accessible to logged-in users
 const ProtectedRoutes = () => {

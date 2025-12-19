@@ -9,7 +9,6 @@ import SentenceScheduler from './components/SuperMemo/SentenceScheduler.tsx'
 import Profile from './components/Profile/Profile.tsx'
 import { createBrowserRouter, RouterProvider, } from 'react-router-dom'
 import './styles/globals.css'
-import LearnRouter from './components/Learn/LearnRouter.tsx'
 
 const router = createBrowserRouter([
   {

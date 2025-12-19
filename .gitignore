@@ -26,3 +26,6 @@ dist-ssr
 
 #ignore client folder in components
 components/client
+
+#ignore flashcard_design folder (Next.js reference, not used in React app)
+src/flashcard_design

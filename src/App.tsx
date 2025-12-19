@@ -6,9 +6,8 @@ import { Session } from '@supabase/supabase-js';
 const LOCAL_SESSION_KEY = 'sb_minimal_session_v1';
 
 function App() {
-  const [session, setSession] = useState<Session | null>(null);
+  const [, setSession] = useState<Session | null>(null);
   const expiryTimerRef = useRef<number | null>(null);
-  const subRef = useRef<any>(null);
 
   //helper: persist minimal session to avoid storing raw access/refresh tokens
   const persistMinimalSession = (s: Session | null) => {
@@ -30,6 +29,10 @@ function App() {
       expiryTimerRef.current = null;
     }
   }
+
+  // Use persistMinimalSession and clearTimer if needed
+  void persistMinimalSession;
+  void clearTimer;
 
   //schedule expiry handler
 
