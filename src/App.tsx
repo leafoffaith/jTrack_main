@@ -1,9 +1,15 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, ReactNode } from 'react';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { supaClient } from './components/Client/supaClient';
 import { Session } from '@supabase/supabase-js';
+import { CacheManager } from './lib/cacheManager';
+import { getNumericUserId } from './components/Client/userIdHelper';
 
-function App() {
+interface AppProps {
+  children?: ReactNode;
+}
+
+function App({ children }: AppProps) {
   const [, setSession] = useState<Session | null>(null);
 
   //helper: persist minimal session to avoid storing raw access/refresh tokens
@@ -45,9 +51,36 @@ function App() {
         console.log("Error in getSession:", error);
       });
 
-    supaClient.auth.onAuthStateChange((_event, session) => {
+    // Listen for auth state changes and clear cache on logout
+    const { data: { subscription } } = supaClient.auth.onAuthStateChange(async (event, session) => {
       setSession(session);
+      
+      if (event === 'SIGNED_OUT' && session?.user?.id) {
+        try {
+          const numericUserId = await getNumericUserId(session.user.id);
+          await CacheManager.clearUserCache(numericUserId);
+        } catch (error) {
+          console.error('Error clearing cache on logout:', error);
+        }
+      }
     });
+
+    // Cleanup subscription
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  // Periodic cache cleanup
+  useEffect(() => {
+    // Clear expired cache every 5 minutes
+    const interval = setInterval(() => {
+      CacheManager.clearExpiredCache().catch(error => {
+        console.error('Error clearing expired cache:', error);
+      });
+    }, 5 * 60 * 1000);
+
+    return () => clearInterval(interval);
   }, []);
 
   const queryClient = new QueryClient({
@@ -61,8 +94,7 @@ function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Your app content */}
-
+      {children}
     </QueryClientProvider>
   );
 }

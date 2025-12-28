@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import dayjs from 'dayjs';
 import { supermemo, SuperMemoGrade } from 'supermemo';
 import { Flashcard, HiraganaCard } from '../Flashcard/Flashcard';
 import { FlashcardItem } from '../Flashcard/FlashcardItem';
-import { fetchAvailableHiragana } from '../Fetching/useHiraganaFetch';
+import { fetchAvailableHiragana, fetchDueHiragana, fetchNewHiragana } from '../Fetching/useHiraganaFetch';
 import { Button } from '../ui/button';
 import { Card, CardContent } from '../ui/card';
 import { ArrowLeft, CheckCircle2 } from 'lucide-react';
@@ -12,6 +12,8 @@ import { supaClient } from '../Client/supaClient';
 import { useAuth } from '../Client/useAuth';
 import { getNumericUserId } from '../Client/userIdHelper';
 import { initializeSession, markNewCardShown } from '../Client/sessionHelper';
+import { COLOR_PINK, COLOR_BLUE } from '../../constants/colors';
+import { CacheManager } from '../../lib/cacheManager';
 
 interface UpdatedFlashcard extends FlashcardItem {
   due_date: string;
@@ -32,6 +34,8 @@ interface StudiedFlashcardData {
 
 const HiraganaScheduler = (): JSX.Element => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const mode = searchParams.get('mode'); // 'new', 'due', or null (default)
   const [hiraganaData, setHiraganaData] = useState<FlashcardItem[]>([]);
   const [practicedFlashcards, setPracticedFlashcards] = useState<UpdatedFlashcard[]>([]);
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
@@ -47,10 +51,21 @@ const HiraganaScheduler = (): JSX.Element => {
     
     if (!userId || isLoading) return;
 
-    // Fetch available flashcards (both studied and new)
+    // Fetch available flashcards based on mode
     const fetchFlashcards = async (): Promise<void> => {
       try {
-        const result = await fetchAvailableHiragana(userId);
+        console.log("Fetching flashcards for mode:", mode);
+        let result;
+        
+        if (mode === 'new') {
+          result = await fetchNewHiragana(userId);
+        } else if (mode === 'due') {
+          result = await fetchDueHiragana(userId);
+        } else {
+          // Default behavior: due cards first, then new cards
+          result = await fetchAvailableHiragana(userId);
+        }
+        
         console.log("Available flashcards:", result.cards);
         setHiraganaData(result.cards);
         setStudyMessage(result.message);
@@ -61,7 +76,7 @@ const HiraganaScheduler = (): JSX.Element => {
     };
 
     void fetchFlashcards();
-  }, [userId, isLoading]);
+  }, [userId, isLoading, mode]);
 
   const practice = async (grade: SuperMemoGrade): Promise<void> => {
     if (!userId) {
@@ -128,6 +143,16 @@ const HiraganaScheduler = (): JSX.Element => {
 
       if (studiedError) {
         console.error('Error updating studied flashcard:', studiedError);
+      } else {
+        // Update cache optimistically
+        await CacheManager.updateSingleFlashcard(numericUserId, 'hiragana', {
+          front: updatedFlashcard.front,
+          back: updatedFlashcard.back,
+          interval: updatedFlashcard.interval,
+          repetition: updatedFlashcard.repetition,
+          efactor: updatedFlashcard.efactor,
+          due_date: updatedFlashcard.due_date
+        });
       }
 
     } catch (error) {
@@ -191,6 +216,19 @@ const HiraganaScheduler = (): JSX.Element => {
     void practice(rating);
   };
 
+  // Determine UI colors and labels based on mode
+  const getModeColor = () => {
+    if (mode === 'new') return COLOR_PINK;
+    if (mode === 'due') return COLOR_BLUE;
+    return undefined; // Default
+  };
+
+  const getModeLabel = () => {
+    if (mode === 'new') return 'New Cards';
+    if (mode === 'due') return 'Due Cards';
+    return 'Hiragana';
+  };
+
   // Show completion message
   if (isComplete || studyMessage) {
     return (
@@ -235,8 +273,8 @@ const HiraganaScheduler = (): JSX.Element => {
               <ArrowLeft className="h-4 w-4" />
               Back to Decks
             </Button>
-            <div className="text-sm text-muted-foreground">
-              Card {currentCardIndex + 1} of {hiraganaData.length}
+            <div className="text-sm font-medium" style={{ color: getModeColor() || 'inherit' }}>
+              {getModeLabel()}: {currentCardIndex + 1} / {hiraganaData.length}
             </div>
           </div>
 

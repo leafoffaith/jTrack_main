@@ -7,6 +7,7 @@ import KatakanaScheduler from './components/SuperMemo/KatakanaScheduler.tsx'
 import KanjiScheduler from './components/SuperMemo/KanjiScheduler.tsx'
 import SentenceScheduler from './components/SuperMemo/SentenceScheduler.tsx'
 import Profile from './components/Profile/Profile.tsx'
+import KanaChart from './components/KanaChart/KanaChart.tsx'
 import { createBrowserRouter, RouterProvider, } from 'react-router-dom'
 import './styles/globals.css'
 
@@ -28,8 +29,18 @@ const router = createBrowserRouter([
         errorElement: <div>Not Found</div>,
       },
       {
+        path: '/learn/hiragana/chart',
+        element: <KanaChart type="hiragana" />,
+        errorElement: <div>Not Found</div>,
+      },
+      {
         path: '/learn/katakana',
         element: <KatakanaScheduler />,
+        errorElement: <div>Not Found</div>,
+      },
+      {
+        path: '/learn/katakana/chart',
+        element: <KanaChart type="katakana" />,
         errorElement: <div>Not Found</div>,
       },
       {

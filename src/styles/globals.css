@@ -3,48 +3,68 @@
 @tailwind utilities;
 
 :root {
-  --background: 38 44% 96%;
-  --foreground: 220 40% 25%;
-  --card: 38 44% 96%;
-  --card-foreground: 220 40% 25%;
-  --popover: 38 44% 96%;
-  --popover-foreground: 220 40% 25%;
-  --primary: 28 40% 55%;
-  --primary-foreground: 38 44% 96%;
-  --secondary: 38 20% 90%;
-  --secondary-foreground: 220 40% 25%;
-  --muted: 38 20% 90%;
-  --muted-foreground: 220 20% 50%;
-  --accent: 38 20% 90%;
-  --accent-foreground: 220 40% 25%;
+  /* New JTrack Color Palette */
+  /* Bubblegum Pink (#ef476f) - Primary/New Cards */
+  --primary: 346 70% 61%;
+  --primary-foreground: 140 10% 94%;
+  
+  /* Ocean Blue (#118ab2) - Secondary/Due Cards */
+  --secondary: 195 83% 38%;
+  --secondary-foreground: 140 10% 94%;
+  
+  /* Platinum (#eef1ef) - Background */
+  --background: 140 10% 94%;
+  --foreground: 163 11% 12%;
+  
+  /* Carbon Black (#1c2321) - Text/Foreground */
+  --card: 140 10% 94%;
+  --card-foreground: 163 11% 12%;
+  
+  /* Blue Gray (#6C809A) - Accent */
+  --accent: 210 18% 51%;
+  --accent-foreground: 140 10% 94%;
+  
+  /* Muted colors using Platinum */
+  --muted: 140 10% 90%;
+  --muted-foreground: 163 11% 30%;
+  
+  /* Popover uses card colors */
+  --popover: 140 10% 94%;
+  --popover-foreground: 163 11% 12%;
+  
+  /* Destructive (keeping red for errors) */
   --destructive: 0 84% 60%;
-  --destructive-foreground: 38 44% 96%;
-  --border: 38 20% 85%;
-  --input: 38 20% 85%;
-  --ring: 28 40% 55%;
+  --destructive-foreground: 140 10% 94%;
+  
+  /* Borders and inputs */
+  --border: 140 10% 85%;
+  --input: 140 10% 85%;
+  --ring: 346 70% 61%;
+  
   --radius: 0.625rem;
 }
 
 .dark {
-  --background: 220 40% 10%;
-  --foreground: 38 44% 96%;
-  --card: 220 40% 15%;
-  --card-foreground: 38 44% 96%;
-  --popover: 220 40% 15%;
-  --popover-foreground: 38 44% 96%;
-  --primary: 28 40% 55%;
-  --primary-foreground: 220 40% 10%;
-  --secondary: 220 30% 20%;
-  --secondary-foreground: 38 44% 96%;
-  --muted: 220 30% 20%;
-  --muted-foreground: 220 20% 65%;
-  --accent: 220 30% 20%;
-  --accent-foreground: 38 44% 96%;
-  --destructive: 0 62% 50%;
-  --destructive-foreground: 38 44% 96%;
-  --border: 220 30% 25%;
-  --input: 220 30% 25%;
-  --ring: 28 40% 55%;
+  /* Dark mode using new palette - inverted for dark theme */
+  --background: 163 11% 12%;
+  --foreground: 140 10% 94%;
+  --card: 163 11% 15%;
+  --card-foreground: 140 10% 94%;
+  --popover: 163 11% 15%;
+  --popover-foreground: 140 10% 94%;
+  --primary: 346 70% 61%;
+  --primary-foreground: 163 11% 12%;
+  --secondary: 195 83% 38%;
+  --secondary-foreground: 140 10% 94%;
+  --muted: 163 11% 20%;
+  --muted-foreground: 140 10% 70%;
+  --accent: 210 18% 51%;
+  --accent-foreground: 140 10% 94%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 140 10% 94%;
+  --border: 163 11% 25%;
+  --input: 163 11% 25%;
+  --ring: 346 70% 61%;
 }
 
 * {
@@ -69,4 +89,13 @@ body {
   min-height: 100vh;
   margin: 0;
   padding: 0;
+}
+
+/* WaniKani-style bold, sharp shadows */
+.shadow-wanikani {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.shadow-wanikani-hover {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
 }

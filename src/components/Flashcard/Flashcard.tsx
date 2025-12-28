@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card, CardContent } from '../ui/card';
 import { cn } from '../../lib/utils';
+import { COLOR_PINK, COLOR_BLUE } from '../../constants/colors';
 
 interface FlashcardProps {
   front: React.ReactNode;
@@ -81,10 +82,10 @@ export function Flashcard({
           {/* Due/New Card Label */}
           {isActive && !isFlipped && (isDue || isNew) && (
             <div className="absolute top-0 left-0 right-0 z-10">
-              <div className={cn(
-                "text-xs font-bold px-3 py-1.5 text-center rounded-t-xl",
-                isDue ? "bg-accent text-accent-foreground" : "bg-primary text-primary-foreground"
-              )}>
+              <div 
+                className="text-white text-xs font-bold px-3 py-1.5 text-center rounded-t-xl"
+                style={{ backgroundColor: isDue ? COLOR_BLUE : COLOR_PINK }}
+              >
                 {isDue ? "DUE CARD" : "NEW CARD"}
               </div>
             </div>
@@ -112,10 +113,10 @@ export function Flashcard({
           {/* Due/New Card Label */}
           {isActive && isFlipped && (isDue || isNew) && (
             <div className="absolute top-0 left-0 right-0 z-10">
-              <div className={cn(
-                "text-xs font-bold px-3 py-1.5 text-center rounded-t-xl",
-                isDue ? "bg-accent text-accent-foreground" : "bg-primary text-primary-foreground"
-              )}>
+              <div 
+                className="text-white text-xs font-bold px-3 py-1.5 text-center rounded-t-xl"
+                style={{ backgroundColor: isDue ? COLOR_BLUE : COLOR_PINK }}
+              >
                 {isDue ? "DUE CARD" : "NEW CARD"}
               </div>
             </div>

@@ -1,16 +1,17 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import dayjs from 'dayjs';
 import { supermemo, SuperMemoGrade } from 'supermemo';
 import { Flashcard, KatakanaCard } from '../Flashcard/Flashcard';
 import { FlashcardItem } from '../Flashcard/FlashcardItem';
-import { fetchAvailableKatakana } from '../Fetching/useKatakanaFetch';
+import { fetchAvailableKatakana, fetchDueKatakana, fetchNewKatakana } from '../Fetching/useKatakanaFetch';
 import { Button } from '../ui/button';
 import { Card, CardContent } from '../ui/card';
 import { ArrowLeft, CheckCircle2 } from 'lucide-react';
 import { supaClient } from '../Client/supaClient';
 import { useAuth } from '../Client/useAuth';
 import { getNumericUserId } from '../Client/userIdHelper';
+import { COLOR_PINK, COLOR_BLUE } from '../../constants/colors';
 import { initializeSession, markNewCardShown } from '../Client/sessionHelper';
 
 interface UpdatedFlashcard extends FlashcardItem {
@@ -31,6 +32,8 @@ interface StudiedFlashcardData {
 
 const KatakanaScheduler = (): JSX.Element => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const mode = searchParams.get('mode'); // 'new', 'due', or null (default)
   const [katakanaData, setKatakanaData] = useState<FlashcardItem[]>([]);
   const [practicedFlashcards, setPracticedFlashcards] = useState<UpdatedFlashcard[]>([]);
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
@@ -48,7 +51,18 @@ const KatakanaScheduler = (): JSX.Element => {
 
     const fetchFlashcards = async (): Promise<void> => {
       try {
-        const result = await fetchAvailableKatakana(userId);
+        console.log("Fetching flashcards for mode:", mode);
+        let result;
+        
+        if (mode === 'new') {
+          result = await fetchNewKatakana(userId);
+        } else if (mode === 'due') {
+          result = await fetchDueKatakana(userId);
+        } else {
+          // Default behavior: due cards first, then new cards
+          result = await fetchAvailableKatakana(userId);
+        }
+        
         console.log("Available katakana flashcards:", result.cards);
         setKatakanaData(result.cards);
         setStudyMessage(result.message);
@@ -59,7 +73,7 @@ const KatakanaScheduler = (): JSX.Element => {
     };
 
     void fetchFlashcards();
-  }, [userId, isLoading]);
+  }, [userId, isLoading, mode]);
 
   const practice = async (grade: SuperMemoGrade) => {
     if (!userId) {
@@ -194,6 +208,19 @@ const KatakanaScheduler = (): JSX.Element => {
     void practice(rating);
   };
 
+  // Determine UI colors and labels based on mode
+  const getModeColor = () => {
+    if (mode === 'new') return COLOR_PINK;
+    if (mode === 'due') return COLOR_BLUE;
+    return undefined; // Default
+  };
+
+  const getModeLabel = () => {
+    if (mode === 'new') return 'New Cards';
+    if (mode === 'due') return 'Due Cards';
+    return 'Katakana';
+  };
+
   // Show completion message
   if (isComplete || studyMessage) {
     return (
@@ -238,8 +265,8 @@ const KatakanaScheduler = (): JSX.Element => {
               <ArrowLeft className="h-4 w-4" />
               Back to Decks
             </Button>
-            <div className="text-sm text-muted-foreground">
-              Card {currentCardIndex + 1} of {katakanaData.length}
+            <div className="text-sm font-medium" style={{ color: getModeColor() || 'inherit' }}>
+              {getModeLabel()}: {currentCardIndex + 1} / {katakanaData.length}
             </div>
           </div>
 

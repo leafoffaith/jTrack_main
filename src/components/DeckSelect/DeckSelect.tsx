@@ -4,14 +4,14 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { supaClient } from '../Client/supaClient';
-import { useAuth } from '../Client/useAuth';
-import { getNumericUserId } from '../Client/userIdHelper';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
-import { ArrowRight, BookOpen } from 'lucide-react';
-import dayjs from 'dayjs';
+import { ArrowRight, BookOpen, Grid3x3 } from 'lucide-react';
+import { useAuth } from '../Client/useAuth';
+import { getDeckCardCounts } from '../Fetching/useCardCounts';
+import { COLOR_PINK, COLOR_BLUE } from '../../constants/colors';
+import KanaChartModal from '../KanaChart/KanaChartModal';
 
 interface Deck {
   deck_id: number;
@@ -51,56 +51,28 @@ const deckInfo: Record<string, DeckMetadata> = {
 };
 
 const DeckSelect: React.FC<DeckSelectProps> = ({ deckList }): JSX.Element => {
+  const navigate = useNavigate();
   const { userId, isLoading: authLoading } = useAuth();
   const [deckMetadata, setDeckMetadata] = useState<Record<string, DeckMetadata>>(deckInfo);
+  const [chartModalOpen, setChartModalOpen] = useState(false);
+  const [chartType, setChartType] = useState<'hiragana' | 'katakana'>('hiragana');
 
   useEffect(() => {
     if (!userId || authLoading) return;
 
     const fetchDeckMetadata = async () => {
-      const numericUserId = await getNumericUserId(userId);
-      const today = dayjs().toISOString();
-
       for (const deck of deckList) {
         const deckType = deck.title.split(' ')[0].toLowerCase();
-        
-        // Fetch due cards count
-        const { data: dueCards } = await supaClient
-          .from('studied_flashcards')
-          .select('id')
-          .eq('user_id', numericUserId)
-          .eq('original_deck', deckType)
-          .lte('due_date', today);
 
-        // Fetch studied cards for this user/deck
-        const { data: studiedCards } = await supaClient
-          .from('studied_flashcards')
-          .select('front')
-          .eq('user_id', numericUserId)
-          .eq('original_deck', deckType);
-
-        // Fetch total cards in this deck
-        let totalCards = 0;
-        if (deckType === 'hiragana' || deckType === 'katakana') {
-          const { data: allCards } = await supaClient
-            .from(deckType)
-            .select('id');
-          totalCards = allCards?.length || 0;
-        } else if (deckType === 'kanji') {
-          // For kanji, we need to count from the N3/N4/N5 lists
-          // For now, use a rough estimate or query from a kanji table
-          totalCards = 100; // Placeholder - adjust based on your actual data
-        }
-
-        const studiedCount = studiedCards?.length || 0;
-        const newCardsCount = Math.max(0, totalCards - studiedCount);
+        // Use consolidated function to get deck card counts
+        const counts = await getDeckCardCounts(userId, deckType);
 
         setDeckMetadata((prev) => ({
           ...prev,
           [deckType]: {
             ...prev[deckType],
-            dueCards: dueCards?.length || 0,
-            newCards: newCardsCount
+            dueCards: counts.dueCards,
+            newCards: counts.newCards
           }
         }));
       }
@@ -122,37 +94,73 @@ const DeckSelect: React.FC<DeckSelectProps> = ({ deckList }): JSX.Element => {
         {deckList.map((deck: Deck) => {
           const deckType = deck.title.split(' ')[0].toLowerCase();
           const metadata = deckMetadata[deckType] || deckInfo[deckType];
+          const hasChart = deckType === 'hiragana' || deckType === 'katakana';
+
+          const handleViewChart = () => {
+            setChartType(deckType as 'hiragana' | 'katakana');
+            setChartModalOpen(true);
+          };
 
           return (
-            <Link key={deck.deck_id} to={`/learn/${deckType}`}>
-              <Card className="h-full transition-all hover:shadow-lg hover:scale-[1.02] cursor-pointer group">
-                <CardHeader className="space-y-4">
-                  <div className="flex items-start justify-between">
-                    <div className="w-16 h-16 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                      <span className="text-3xl">{metadata.icon}</span>
+            <Card key={deck.deck_id} className="h-full transition-all shadow-wanikani hover:shadow-wanikani-hover hover:scale-[1.02] group flex flex-col">
+              <CardHeader className="space-y-4 flex-1">
+                <div className="flex items-start justify-between">
+                  <div className="w-16 h-16 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                    <span className="text-3xl">{metadata.icon}</span>
+                  </div>
+                  {metadata.dueCards > 0 && (
+                    <div className="px-2 py-1 rounded-md bg-accent text-accent-foreground text-xs font-semibold">
+                      {metadata.dueCards} due
                     </div>
-                    {metadata.dueCards > 0 && (
-                      <div className="px-2 py-1 rounded-md bg-accent text-accent-foreground text-xs font-semibold">
-                        {metadata.dueCards} due
-                      </div>
-                    )}
-                  </div>
-                  <div>
-                    <CardTitle className="text-xl">{deck.title}</CardTitle>
-                    <CardDescription className="mt-2">{metadata.description}</CardDescription>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">{metadata.newCards} new cards</span>
-                    <ArrowRight className="h-4 w-4 text-primary group-hover:translate-x-1 transition-transform" />
-                  </div>
-                  <Button className="w-full" size="lg">
-                    Study Now
+                  )}
+                </div>
+                <div>
+                  <CardTitle className="text-xl">{deck.title}</CardTitle>
+                  <CardDescription className="mt-2">{metadata.description}</CardDescription>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4 flex flex-col">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">{metadata.newCards} new cards</span>
+                  <ArrowRight className="h-4 w-4 text-primary group-hover:translate-x-1 transition-transform" />
+                </div>
+                {hasChart && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleViewChart}
+                    className="w-full gap-2"
+                  >
+                    <Grid3x3 className="h-4 w-4" />
+                    View Chart
                   </Button>
-                </CardContent>
-              </Card>
-            </Link>
+                )}
+                <div className="flex gap-2 mt-auto">
+                  <Button
+                    onClick={() => navigate(`/learn/${deckType}?mode=new`)}
+                    disabled={metadata.newCards === 0}
+                    className="flex-1 text-white hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+                    size="lg"
+                    style={{
+                      backgroundColor: metadata.newCards > 0 ? COLOR_PINK : 'rgb(156, 163, 175)',
+                    }}
+                  >
+                    Study New
+                  </Button>
+                  <Button
+                    onClick={() => navigate(`/learn/${deckType}?mode=due`)}
+                    disabled={metadata.dueCards === 0}
+                    className="flex-1 text-white hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+                    size="lg"
+                    style={{
+                      backgroundColor: metadata.dueCards > 0 ? COLOR_BLUE : 'rgb(156, 163, 175)',
+                    }}
+                  >
+                    Study Due
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
           );
         })}
       </div>
@@ -166,8 +174,15 @@ const DeckSelect: React.FC<DeckSelectProps> = ({ deckList }): JSX.Element => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Kana Chart Modal */}
+      <KanaChartModal
+        type={chartType}
+        open={chartModalOpen}
+        onOpenChange={setChartModalOpen}
+      />
     </div>
-  )
-}
+  );
+};
 
 export default DeckSelect;
