@@ -165,15 +165,15 @@ const DeckSelect: React.FC<DeckSelectProps> = ({ deckList }): JSX.Element => {
         })}
       </div>
 
-      {/* Placeholder for future decks */}
-      <Card className="border-dashed">
-        <CardContent className="flex items-center justify-center py-12">
-          <div className="text-center space-y-2">
-            <BookOpen className="h-12 w-12 text-muted-foreground mx-auto" />
-            <p className="text-muted-foreground">More decks coming soon!</p>
-          </div>
-        </CardContent>
-      </Card>
+        {/* Placeholder for future decks */}
+        <Card key="placeholder" className="border-dashed">
+          <CardContent className="flex items-center justify-center py-12">
+            <div className="text-center space-y-2">
+              <BookOpen className="h-12 w-12 text-muted-foreground mx-auto" />
+              <p className="text-muted-foreground">More decks coming soon!</p>
+            </div>
+          </CardContent>
+        </Card>
 
       {/* Kana Chart Modal */}
       <KanaChartModal
