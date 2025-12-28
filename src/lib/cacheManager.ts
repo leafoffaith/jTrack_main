@@ -4,8 +4,6 @@
  */
 
 import { db, CachedStudiedFlashcard, CachedDeckMetadata } from './db';
-import { supaClient } from '../components/Client/supaClient';
-import { getNumericUserId } from '../components/Client/userIdHelper';
 
 const CACHE_DURATION = {
   STUDIED_FLASHCARDS: 5 * 60 * 1000, // 5 minutes

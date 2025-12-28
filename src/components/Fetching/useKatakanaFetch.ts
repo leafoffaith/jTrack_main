@@ -3,7 +3,7 @@ import { FlashcardItem } from "../Flashcard/FlashcardItem";
 import dayjs from "dayjs";
 import { checkUserHasStudiedRecently, updateUserHasStudied } from "../Client/userStudyHelper";
 import { KatakanaItem, CardFetchResult } from "./types";
-import { fetchDueCards, fetchNewCards, fetchUserStudiedCards } from "./sharedCardFetch";
+import { fetchDueCards, fetchNewCards } from "./sharedCardFetch";
 
 const fetchKatakana = async (): Promise<KatakanaItem[]> => {
   const { data: katakana, error } = await supaClient
@@ -25,10 +25,7 @@ const fetchKatakana = async (): Promise<KatakanaItem[]> => {
   return katakana || [];
 };
 
-//Fetching studied katakana flashcards (using shared utility)
-const fetchUserKatakana = async (userId: string) => {
-  return fetchUserStudiedCards(userId, 'katakana');
-};
+// Removed unused function - using fetchUserStudiedCards directly
 
 /**
  * Fetch only due katakana cards
@@ -69,7 +66,7 @@ export const fetchNewKatakana = async (userId: string): Promise<CardFetchResult>
     fetchKatakana,
     (card) => card.front,
     (card) => card.back,
-    (deckType) => [], // Katakana doesn't use session storage for new cards tracking
+    () => [], // Katakana doesn't use session storage for new cards tracking
     3
   );
 };

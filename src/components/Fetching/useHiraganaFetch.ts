@@ -4,7 +4,7 @@ import dayjs from "dayjs";
 import { checkUserHasStudiedRecently, updateUserHasStudied } from "../Client/userStudyHelper";
 import { getNewCardsShownToday } from "../Client/sessionHelper";
 import { HiraganaItem, CardFetchResult } from "./types";
-import { fetchDueCards, fetchNewCards, fetchUserStudiedCards } from "./sharedCardFetch";
+import { fetchDueCards, fetchNewCards } from "./sharedCardFetch";
 
 //Fetching new Hiragana
 const fetchHiragana = async (): Promise<HiraganaItem[]> => {
@@ -28,10 +28,7 @@ const fetchHiragana = async (): Promise<HiraganaItem[]> => {
 };
 
 
-//Fetching studied hiragana flashcards (using shared utility)
-const fetchUserHiragana = async (userId: string) => {
-  return fetchUserStudiedCards(userId, 'hiragana');
-};
+// Removed unused function - using fetchUserStudiedCards directly
 
 /**
  * Fetch only due hiragana cards
