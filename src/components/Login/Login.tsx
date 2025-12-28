@@ -8,7 +8,7 @@ import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { BookOpen } from 'lucide-react';
+import jtrackLogo from '../../assets/jtrack-logo.png';
 
 export default function Login() {
   const [searchParams] = useSearchParams();
@@ -128,8 +128,8 @@ export default function Login() {
         <Card className="w-full max-w-md">
           <CardHeader className="text-center space-y-2">
             <div className="flex justify-center mb-4">
-              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
-                <BookOpen className="h-6 w-6 text-primary" />
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center">
+                <img src={jtrackLogo} alt="JTrack Logo" className="h-12 w-12 object-contain" />
               </div>
             </div>
             <CardTitle className="text-2xl">{mode === "login" ? "Welcome Back" : "Create Your Account"}</CardTitle>

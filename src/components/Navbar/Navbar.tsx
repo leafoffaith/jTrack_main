@@ -1,8 +1,8 @@
 import { Link } from "react-router-dom";
 import { Button } from "../ui/button";
-import { BookOpen } from "lucide-react";
 import { supaClient } from "../Client/supaClient";
 import { useEffect, useState } from "react";
+import jtrackLogo from "../../assets/jtrack-logo.png";
 
 const Navbar = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -46,7 +46,7 @@ const Navbar = () => {
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center gap-8">
             <Link to="/" className="flex items-center gap-2 font-semibold text-lg">
-              <BookOpen className="h-6 w-6 text-primary" />
+              <img src={jtrackLogo} alt="JTrack Logo" className="h-6 w-6 object-contain" />
               <span>JTrack</span>
             </Link>
             <div className="hidden md:flex items-center gap-6">
