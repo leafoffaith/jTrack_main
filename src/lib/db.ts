@@ -45,8 +45,8 @@ class JTrackDatabase extends Dexie {
   constructor() {
     super('JTrackDB');
     this.version(1).stores({
-      studiedFlashcards: '++id, user_id, original_deck, front, due_date, cached_at',
-      deckMetadata: '++id, user_id, deck_type, cached_at',
+      studiedFlashcards: '++id, user_id, original_deck, front, due_date, cached_at, [user_id+original_deck]',
+      deckMetadata: '++id, [user_id+deck_type], user_id, deck_type, cached_at',
       userProfiles: '++id, user_id, cached_at'
     });
   }
