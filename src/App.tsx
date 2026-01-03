@@ -44,7 +44,7 @@ function App({ children }: AppProps) {
     supaClient.auth.getSession()
       .then(({ data: { session } }) => {
         console.log("getSession is running");
-        console.log(session, "session");
+        // console.log(session, "session");
         setSession(session);
       })
       .catch((error) => {
@@ -54,7 +54,7 @@ function App({ children }: AppProps) {
     // Listen for auth state changes and clear cache on logout
     const { data: { subscription } } = supaClient.auth.onAuthStateChange(async (event, session) => {
       setSession(session);
-      
+
       if (event === 'SIGNED_OUT' && session?.user?.id) {
         try {
           const numericUserId = await getNumericUserId(session.user.id);

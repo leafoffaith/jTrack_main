@@ -3,8 +3,8 @@ import Navbar from "../Navbar/Navbar";
 
 const Sentences = () => {
 
-   const kArray = ['N5', 'N4', 'N3'];
-        
+    const kArray = ['N5', 'N4', 'N3'];
+
     //function to manage deck click
     const DeckClick = (deck: string) => {
         console.log(deck)
@@ -12,23 +12,23 @@ const Sentences = () => {
 
     return (
         <>
-         <div>
-            {/* header navbar div */}
-            <div className='header'>
-                <Navbar />
+            <div>
+                {/* header navbar div */}
+                <div className='header'>
+                    <Navbar />
+                </div>
+                <h2>Please choose a deck!</h2>
+                {kArray.map((k) => {
+                    return (
+                        <div key={k}>
+                            <h3>{k}</h3>
+                            <Link to={`/learn/sentences/${k}`}>
+                                <button onClick={() => DeckClick(k)}>Select</button>
+                            </Link>
+                        </div>
+                    )
+                })}
             </div>
-            <h2>Please choose a deck!</h2>
-            {kArray.map((k) => {
-                return (
-                    <div key={k}>
-                        <h3>{k}</h3>
-                        <Link to={`/learn/sentences/${k}`}>
-                            <button onClick={() => DeckClick(k)}>Select</button>
-                        </Link>
-                    </div>
-                )
-            })}
-         </div>
         </>
     )
 }

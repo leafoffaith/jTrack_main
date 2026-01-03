@@ -64,6 +64,9 @@ const KatakanaScheduler = (): JSX.Element => {
         }
         
         console.log("Available katakana flashcards:", result.cards);
+        // #region agent log
+        fetch('http://127.0.0.1:7242/ingest/bb6f6429-d749-4754-adb5-e5c5acc99493',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'KatakanaScheduler.tsx:66',message:'Setting katakana data',data:{cardCount:result.cards.length,firstCard:result.cards[0] ? {front:result.cards[0].front,back:result.cards[0].back,hasFront:!!result.cards[0].front,hasBack:!!result.cards[0].back} : null,allCards:result.cards.map(c => ({front:c.front,back:c.back}))},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'H2'})}).catch(() => { /* ignore */ });
+        // #endregion
         setKatakanaData(result.cards);
         setStudyMessage(result.message);
         setCurrentCardIndex(0); // Reset to first card
@@ -178,6 +181,14 @@ const KatakanaScheduler = (): JSX.Element => {
   };
 
   const currentFlashcard: FlashcardItem | undefined = katakanaData[currentCardIndex];
+  
+  // #region agent log
+  useEffect(() => {
+    if (currentFlashcard) {
+      fetch('http://127.0.0.1:7242/ingest/bb6f6429-d749-4754-adb5-e5c5acc99493',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'KatakanaScheduler.tsx:180',message:'Current flashcard data',data:{currentCardIndex,front:currentFlashcard.front,back:currentFlashcard.back,hasFront:!!currentFlashcard.front,hasBack:!!currentFlashcard.back,allKeys:Object.keys(currentFlashcard)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'H2'})}).catch(() => { /* ignore */ });
+    }
+  }, [currentCardIndex, currentFlashcard]);
+  // #endregion
 
   /**
    * @TODO this needs to be simplified, because it's a timestamp it has to be either on or after tsz

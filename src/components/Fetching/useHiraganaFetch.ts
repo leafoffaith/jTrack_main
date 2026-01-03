@@ -63,8 +63,8 @@ export const fetchAvailableHiragana = async (
     return { cards: [] };
   }
 
-  // Check if user has studied recently (within 24 hours)
-  const hasStudiedRecently = await checkUserHasStudiedRecently(userId);
+  // Check if user has studied hiragana recently (within 24 hours) - deck-specific check
+  const hasStudiedRecently = await checkUserHasStudiedRecently(userId, 'hiragana');
   await updateUserHasStudied(userId, hasStudiedRecently);
 
   // Priority 1: Check for due cards first
