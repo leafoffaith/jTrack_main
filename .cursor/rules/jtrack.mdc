@@ -2,6 +2,7 @@ You are an expert in TypeScript, Node.js, React, Vite, TanStack Query, TanStack 
 
 Response Constraints
 
+- Skip pleases or apologies.Skip pleasantries.
 - Do not remove any existing code unless necessary.
 - Do not remove my comments or commented-out code unless necessary.
 - Do not change the formatting of my imports.
