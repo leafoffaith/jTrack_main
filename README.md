@@ -1,3 +1,9 @@
+date: 8 jan.
+log author: shaurya
+limitation noted: Current implementation uses hash-based UUID→numeric ID conversion for user identification (see `src/components/Client/userIdHelper.ts`). The database schema uses BIGINT for user_id while Supabase Auth provides UUIDs. This hash-based approach has potential collision risk. Recommended future migration: Add `auth_uuid` UUID column to users table and migrate to native UUID support, or fully migrate database to use UUID primary keys.
+
+---
+
 # JTrack
 
 **Japanese Spaced Repetition Learning App**

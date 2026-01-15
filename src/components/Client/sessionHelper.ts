@@ -43,7 +43,7 @@ export const isNewSession = (): boolean => {
 /**
  * Get new cards shown today for a specific deck
  */
-export const getNewCardsShownToday = (deckType: 'hiragana' | 'katakana'): string[] => {
+export const getNewCardsShownToday = (deckType: string): string[] => {
   const key = `${deckType}NewCardsToday`;
   const stored = localStorage.getItem(key);
   if (!stored) return [];
@@ -65,7 +65,7 @@ export const getNewCardsShownToday = (deckType: 'hiragana' | 'katakana'): string
 /**
  * Mark a new card as shown today for a specific deck
  */
-export const markNewCardShown = (deckType: 'hiragana' | 'katakana', front: string): void => {
+export const markNewCardShown = (deckType: string, front: string): void => {
   const key = `${deckType}NewCardsToday`;
   const currentCards = getNewCardsShownToday(deckType);
   
