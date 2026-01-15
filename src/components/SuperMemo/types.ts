@@ -1,4 +1,3 @@
-import { SuperMemoGrade } from 'supermemo';
 import { FlashcardItem } from '../Flashcard/FlashcardItem';
 
 /**

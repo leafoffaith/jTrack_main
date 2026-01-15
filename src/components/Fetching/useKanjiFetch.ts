@@ -183,8 +183,15 @@ export const fetchAvailableKanji = async (
   return availableFlashcards;
 };
 
-export const fetchKanjiList = async (): Promise<FlashcardItem[]> => {
-  const { data: kanjiList, error } = await supaClient.from("kanji").select("*");
+export const fetchKanjiList = async (level?: string): Promise<FlashcardItem[]> => {
+  let query = supaClient.from("kanji").select("*");
+
+  // Filter by JLPT level if provided
+  if (level) {
+    query = query.eq("jlpt_level", level);
+  }
+
+  const { data: kanjiList, error } = await query;
 
   if (error) {
     console.error("Error fetching kanji list: ", error);
@@ -192,4 +199,79 @@ export const fetchKanjiList = async (): Promise<FlashcardItem[]> => {
   }
 
   return (kanjiList || []) as FlashcardItem[];
+};
+
+/**
+ * Wrapper functions matching GenericScheduler pattern
+ * These only take userId and return CardFetchResult
+ */
+import { CardFetchResult } from './types';
+import { fetchDueCards } from './sharedCardFetch';
+import { getNewCardsShownToday } from '../Client/sessionHelper';
+
+export const fetchAvailableKanjiCards = async (
+  userId: string
+): Promise<CardFetchResult> => {
+  if (!userId) {
+    return { cards: [] };
+  }
+
+  // Get level from URL query params
+  const urlParams = new URLSearchParams(window.location.search);
+  const level = urlParams.get('level') || undefined;
+
+  const allKanji = await fetchKanjiList(level);
+  const availableCards = await fetchAvailableKanji(userId, allKanji);
+
+  return { cards: availableCards };
+};
+
+export const fetchDueKanjiCards = async (
+  userId: string
+): Promise<CardFetchResult> => {
+  return await fetchDueCards(userId, 'kanji');
+};
+
+export const fetchNewKanjiCards = async (
+  userId: string
+): Promise<CardFetchResult> => {
+  // Get level from URL query params
+  const urlParams = new URLSearchParams(window.location.search);
+  const level = urlParams.get('level') || undefined;
+
+  const allKanji = await fetchKanjiList(level);
+
+  const studiedCards = await fetchUserKanji(userId, level);
+  const studiedFronts = studiedCards.map(card => card.front);
+
+  // Filter new kanji
+  const newKanji = allKanji.filter(k => !studiedFronts.includes(k.front));
+
+  // Get cards shown today
+  const newCardsShownToday = getNewCardsShownToday('kanji');
+  const dailyLimit = 3;
+
+  // Check daily limit
+  if (newCardsShownToday.length >= dailyLimit) {
+    return {
+      cards: [],
+      message: "You have finished studying for now! Come back tomorrow for more cards :)"
+    };
+  }
+
+  // Filter out cards shown today
+  const availableNewKanji = newKanji.filter(k => !newCardsShownToday.includes(k.front));
+
+  // Return up to remaining limit
+  const remainingLimit = dailyLimit - newCardsShownToday.length;
+  const cardsToShow = availableNewKanji.slice(0, remainingLimit);
+
+  if (cardsToShow.length === 0) {
+    return {
+      cards: [],
+      message: "You have finished studying for now! Come back tomorrow for more cards :)"
+    };
+  }
+
+  return { cards: cardsToShow };
 };

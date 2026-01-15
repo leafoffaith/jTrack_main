@@ -6,7 +6,7 @@ import {
   updateUserHasStudied,
 } from "../Client/userStudyHelper";
 import { KatakanaItem, CardFetchResult } from "./types";
-import { fetchDueCards, fetchNewCards } from "./sharedCardFetch";
+import { fetchDueCards } from "./sharedCardFetch";
 
 const fetchKatakana = async (): Promise<KatakanaItem[]> => {
   const { data: katakana, error } = await supaClient

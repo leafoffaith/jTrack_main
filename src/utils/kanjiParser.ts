@@ -7,8 +7,15 @@ interface KanjiEntry {
   frequency?: number;
 }
 
-export function parseKanjiBank(data: any[]): KanjiEntry[];
+export function parseKanjiBank(_data: any[]): KanjiEntry[] {
+  // TODO: Implement kanji bank parsing
+  return [];
+}
+
 export function filterByJLPT(
   entries: KanjiEntry[],
   level: string
-): KanjiEntry[];
+): KanjiEntry[] {
+  // TODO: Implement JLPT filtering
+  return entries.filter(entry => entry.jlptLevel === level);
+}

@@ -9,6 +9,8 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../Client/useAuth";
 import { getTotalCardCounts, CardCounts } from "../Fetching/useCardCounts";
 import { COLOR_PINK, COLOR_BLUE } from "../../constants/colors";
+import { useReviewForecast } from "../../hooks/useReviewForecast";
+import ReviewHeatmap from "../ReviewHeatmap/ReviewHeatmap";
 
 const Home = () => {
     const location = useLocation();
@@ -17,6 +19,7 @@ const Home = () => {
     const { userId, isLoading: authLoading } = useAuth();
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [cardCounts, setCardCounts] = useState<CardCounts>({ newCards: 0, dueCards: 0 });
+    const { forecast, isLoading: forecastLoading } = useReviewForecast(userId);
 
     useEffect(() => {
         const checkAuth = async () => {
@@ -114,13 +117,15 @@ const Home = () => {
                                                     <TrendingUp className="h-5 w-5 text-gray-600" />
                                                     <h3 className="text-lg font-semibold text-gray-900">Reviews Forecast</h3>
                                                 </div>
-                                                <p className="text-sm text-gray-600">
-                                                    {cardCounts.dueCards > 0 ? (
-                                                        <>You have <strong>{cardCounts.dueCards} reviews</strong> to do <strong>right now!</strong></>
-                                                    ) : (
-                                                        <>You don't have any reviews forecast for this week, but keep studying to unlock more!</>
-                                                    )}
-                                                </p>
+                                                {forecastLoading ? (
+                                                    <div className="text-sm text-gray-500 text-center py-4">Loading forecast...</div>
+                                                ) : forecast.days.length > 0 ? (
+                                                    <ReviewHeatmap days={forecast.days} maxCount={forecast.maxCount} />
+                                                ) : (
+                                                    <p className="text-sm text-gray-600">
+                                                        You don't have any reviews forecast for the next two weeks. Keep studying to unlock more!
+                                                    </p>
+                                                )}
                                             </div>
                                         </CardContent>
                                     </Card>

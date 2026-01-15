@@ -1,5 +1,3 @@
-import { supaClient } from './supaClient';
-
 /**
  * Converts Supabase auth UUID to numeric user ID for studied_flashcards table
  * The studied_flashcards table uses bigint for user_id, so we hash the UUID

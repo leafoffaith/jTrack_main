@@ -22,7 +22,7 @@ const Kanji = () => {
                     return (
                         <div key={k}>
                             <h3>{k}</h3>
-                            <Link to={`/learn/kanji/${k}`}>
+                            <Link to={`/learn/kanji?level=${k}`}>
                                 <button onClick={() => DeckClick(k)}>Select</button>
                             </Link>
                         </div>

@@ -169,13 +169,69 @@ export function KanjiCard({
   onReading,
   kunReading,
   examples,
+  strokeCount,
 }: {
   kanji: string;
   meaning: string;
   onReading?: string;
   kunReading?: string;
   examples?: string[];
+  strokeCount?: number;
 }) {
+  const [svgData, setSvgData] = React.useState<string | null>(null);
+  const [loadingSvg, setLoadingSvg] = React.useState(false);
+  const [exampleSentences, setExampleSentences] = React.useState<string[]>([]);
+
+  // Fetch stroke order SVG from kanjiapi.dev
+  React.useEffect(() => {
+    const fetchSvg = async () => {
+      try {
+        setLoadingSvg(true);
+        const response = await fetch(`https://kanjiapi.dev/v1/kanji/${encodeURIComponent(kanji)}`);
+        const data = await response.json();
+        if (data.stroke_svg) {
+          setSvgData(data.stroke_svg);
+        }
+      } catch (error) {
+        console.error('Error fetching stroke SVG:', error);
+      } finally {
+        setLoadingSvg(false);
+      }
+    };
+
+    if (kanji) {
+      void fetchSvg();
+    }
+  }, [kanji]);
+
+  // Load example sentences from tatoeba.json
+  React.useEffect(() => {
+    const loadExamples = async () => {
+      try {
+        // Dynamically import tatoeba.json
+        const tatoebaData = await import('../JMDict/tatoeba.json');
+        const sentences = (tatoebaData.default || tatoebaData) as Array<[number, string, number, string]>;
+
+        // Filter sentences containing this kanji (limit to 2)
+        // Format: [id, japanese, id2, english]
+        const filtered = sentences
+          .filter(([, japanese]) => japanese.includes(kanji))
+          .slice(0, 2)
+          .map(([, japanese, , english]) => `${japanese} — ${english}`);
+
+        setExampleSentences(filtered);
+      } catch (error) {
+        console.error('Error loading example sentences:', error);
+      }
+    };
+
+    if (kanji && !examples) {
+      void loadExamples();
+    }
+  }, [kanji, examples]);
+
+  const displayExamples = examples || exampleSentences;
+
   return (
     <div className="space-y-6 w-full">
       <div className="text-7xl font-bold">{kanji}</div>
@@ -196,11 +252,29 @@ export function KanjiCard({
             <p className="text-lg">{kunReading}</p>
           </div>
         )}
-        {examples && examples.length > 0 && (
+        {strokeCount && (
+          <div>
+            <p className="text-sm text-muted-foreground">Stroke Count</p>
+            <p className="text-lg font-semibold">{strokeCount} strokes</p>
+          </div>
+        )}
+        {svgData && (
+          <div>
+            <p className="text-sm text-muted-foreground mb-2">Stroke Order</p>
+            <div
+              className="bg-gray-50 rounded-lg p-4 flex items-center justify-center"
+              dangerouslySetInnerHTML={{ __html: svgData }}
+            />
+          </div>
+        )}
+        {loadingSvg && !svgData && (
+          <div className="text-xs text-muted-foreground">Loading stroke order...</div>
+        )}
+        {displayExamples && displayExamples.length > 0 && (
           <div>
             <p className="text-sm text-muted-foreground">Examples</p>
             <ul className="text-sm space-y-1">
-              {examples.map((ex, i) => (
+              {displayExamples.map((ex, i) => (
                 <li key={i}>{ex}</li>
               ))}
             </ul>

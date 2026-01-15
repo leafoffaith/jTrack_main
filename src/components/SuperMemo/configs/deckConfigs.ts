@@ -1,3 +1,4 @@
+import React from 'react';
 import { DeckConfig } from '../types';
 import { HiraganaCard, KatakanaCard } from '../../Flashcard/Flashcard';
 import {
@@ -10,6 +11,11 @@ import {
   fetchDueKatakana,
   fetchNewKatakana,
 } from '../../Fetching/useKatakanaFetch';
+import {
+  fetchAvailableKanjiCards,
+  fetchDueKanjiCards,
+  fetchNewKanjiCards,
+} from '../../Fetching/useKanjiFetch';
 
 export const HIRAGANA_CONFIG: DeckConfig = {
   deckType: 'hiragana',
@@ -44,4 +50,25 @@ export const KATAKANA_CONFIG: DeckConfig = {
   limits: {
     dailyDueCards: 3,
   },
+};
+
+// Simple Kanji front card component (just shows the character)
+const KanjiCardFront = ({ character }: { character: string; romaji?: string }): JSX.Element => {
+  return React.createElement('div', { className: 'text-8xl font-bold' }, character);
+};
+
+export const KANJI_CONFIG: DeckConfig = {
+  deckType: 'kanji',
+  deckName: 'Kanji',
+  modeLabel: {
+    default: 'Kanji',
+    new: 'New Cards',
+    due: 'Due Cards',
+  },
+  fetchFunctions: {
+    fetchAvailable: fetchAvailableKanjiCards,
+    fetchDue: fetchDueKanjiCards,
+    fetchNew: fetchNewKanjiCards,
+  },
+  CardComponent: KanjiCardFront,
 };

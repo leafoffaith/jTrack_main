@@ -284,6 +284,7 @@ const GenericScheduler = ({ config }: GenericSchedulerProps): JSX.Element => {
               <Flashcard
                 front={<CardComponent character={currentFlashcard.front} romaji="" />}
                 back={<CardComponent character={currentFlashcard.front} romaji={currentFlashcard.back || ''} />}
+                kanjiBack={currentFlashcard.kanjiBack}
                 isFlipped={isFlipped}
                 isDue={isDue}
                 isNew={isNew && !isDue}
