@@ -1,82 +1,92 @@
-import { supaClient } from "../Client/supaClient";
 import { FlashcardItem } from "../Flashcard/FlashcardItem";
-import { getNumericUserId } from "../Client/userIdHelper";
+import { fetchDueCards } from "./sharedCardFetch";
+import { getNewCardsShownToday, markNewCardShown } from "../Client/sessionHelper";
+import data from "../../assets/jmdict/tatoeba.json";
 
-interface StudiedFlashcard extends FlashcardItem {
-  user_id: number;
-  original_deck?: string;
-  due_date?: string;
-  back?: string | any;
+export interface CardFetchResult {
+  cards: FlashcardItem[];
 }
 
-//Fetching studied sentence flashcards
-const fetchUserSentences = async (
-  userId: string
-): Promise<StudiedFlashcard[]> => {
-  const numericUserId = await getNumericUserId(userId);
-  
-  const { data: d, error } = await supaClient
-    .from("studied_flashcards")
-    .select("*")
-    .eq("user_id", numericUserId)
-    .eq("original_deck", "sentence");
+/**
+ * Load all sentences from tatoeba.json
+ * Format: [id, japanese, id2, english]
+ */
+const loadSentencesFromTatoeba = (): FlashcardItem[] => {
+  const sentences = data as Array<[number, string, number, string]>;
 
-  if (error) {
-    console.error("Error fetching data: ", error);
-    return [];
-  }
-
-  return d || [];
+  // Convert to FlashcardItem format
+  // Use first 1000 sentences to keep it manageable
+  return sentences.slice(0, 1000).map(([_id, japanese, _id2, english]) => ({
+    front: japanese,
+    back: english,
+    interval: 0,
+    repetition: 0,
+    efactor: 2.5,
+    due_date: new Date().toISOString(),
+  }));
 };
 
-export const fetchAvailableSentences = async (
-  userId: string,
-  allSentences: FlashcardItem[]
-): Promise<FlashcardItem[]> => {
-  if (!userId) {
-    return allSentences.slice(0, 10); // Return first 10 if not authenticated
-  }
+/**
+ * Fetch available sentence cards (combines due + new)
+ * Matches GenericScheduler pattern
+ */
+export const fetchAvailableSentenceCards = async (userId: string): Promise<CardFetchResult> => {
+  // Load sentences from tatoeba.json
+  const allSentences = loadSentencesFromTatoeba();
 
-  //Already studied flashcards
-  const studiedFlashcards = await fetchUserSentences(userId);
+  // Get due cards from database
+  const { cards: dueCards } = await fetchDueCards(userId, 'sentence');
 
-  if (!allSentences || allSentences.length === 0) {
-    console.error("No sentence data provided");
-    return [];
-  }
+  // Get new cards
+  const { cards: newCards } = await fetchNewSentenceCards(userId);
 
-  // Get all studied sentence fronts
-  const studiedFronts = studiedFlashcards.map((card) => card.front);
+  // Combine: due cards first, then new cards
+  const availableCards = [...dueCards, ...newCards];
 
-  // Get currently due flashcards (prioritize these)
-  const dueFlashcards = studiedFlashcards
-    .filter((card) => {
-      if (!card.due_date) return false;
-      const dueDate = new Date(card.due_date);
-      const now = new Date();
-      return dueDate <= now;
-    })
-    .map((card) => ({
-      front: card.front,
-      back: card.back || '',
-      interval: card.interval ?? 1,
-      repetition: card.repetition ?? 0,
-      efactor: card.efactor ?? 2.5,
-      due_date: card.due_date,
-      options: card.options,
-    }));
-
-  // Filter out studied sentences to get new ones
-  const newSentences = allSentences
-    .filter((s) => !studiedFronts.includes(s.front))
-    .slice(0, 10); // Get first 10 new sentences
-
-  // Combine: due flashcards first, then new flashcards
-  const availableFlashcards = [
-    ...dueFlashcards,
-    ...newSentences,
-  ];
-
-  return availableFlashcards;
+  return { cards: availableCards };
 };
 
+/**
+ * Fetch only due sentence cards
+ * Matches GenericScheduler pattern
+ */
+export const fetchDueSentenceCards = async (userId: string): Promise<CardFetchResult> => {
+  return await fetchDueCards(userId, 'sentence');
+};
+
+/**
+ * Fetch only new sentence cards (not yet studied)
+ * Respects daily limit of 3 new cards
+ * Matches GenericScheduler pattern
+ */
+export const fetchNewSentenceCards = async (userId: string): Promise<CardFetchResult> => {
+  const DAILY_NEW_CARD_LIMIT = 3;
+  const allSentences = loadSentencesFromTatoeba();
+
+  // Get due cards to filter them out
+  const { cards: dueCards } = await fetchDueCards(userId, 'sentence');
+  const dueFronts = dueCards.map(card => card.front);
+
+  // Filter out already studied sentences
+  const unstudiedSentences = allSentences.filter(
+    sentence => !dueFronts.includes(sentence.front)
+  );
+
+  // Check daily limit
+  const shownToday = getNewCardsShownToday('sentence');
+  const remaining = Math.max(0, DAILY_NEW_CARD_LIMIT - shownToday);
+
+  if (remaining === 0) {
+    return { cards: [] };
+  }
+
+  // Return limited number of new cards
+  const cardsToShow = unstudiedSentences.slice(0, remaining);
+
+  // Mark cards as shown today
+  cardsToShow.forEach(() => {
+    markNewCardShown('sentence');
+  });
+
+  return { cards: cardsToShow };
+};

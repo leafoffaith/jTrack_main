@@ -16,6 +16,11 @@ import {
   fetchDueKanjiCards,
   fetchNewKanjiCards,
 } from '../../Fetching/useKanjiFetch';
+import {
+  fetchAvailableSentenceCards,
+  fetchDueSentenceCards,
+  fetchNewSentenceCards,
+} from '../../Fetching/useSentenceFetch';
 
 export const HIRAGANA_CONFIG: DeckConfig = {
   deckType: 'hiragana',
@@ -71,4 +76,40 @@ export const KANJI_CONFIG: DeckConfig = {
     fetchNew: fetchNewKanjiCards,
   },
   CardComponent: KanjiCardFront,
+};
+
+// Sentence card component (shows Japanese sentence, and translation if provided)
+const SentenceCardFront = ({ character, romaji }: { character: string; romaji?: string }): JSX.Element => {
+  if (romaji) {
+    // Back side: show both sentence and translation
+    return React.createElement(
+      'div',
+      { className: 'space-y-6 w-full max-w-lg mx-auto' },
+      React.createElement('div', { className: 'text-3xl font-bold leading-relaxed' }, character),
+      React.createElement(
+        'div',
+        { className: 'border-t-2 border-gray-200 pt-4' },
+        React.createElement('p', { className: 'text-sm text-muted-foreground mb-2' }, 'Translation'),
+        React.createElement('p', { className: 'text-xl text-gray-700' }, romaji)
+      )
+    );
+  }
+  // Front side: show only Japanese sentence
+  return React.createElement('div', { className: 'text-3xl font-bold leading-relaxed px-4' }, character);
+};
+
+export const SENTENCE_CONFIG: DeckConfig = {
+  deckType: 'sentence',
+  deckName: 'Sentences',
+  modeLabel: {
+    default: 'Sentences',
+    new: 'New Cards',
+    due: 'Due Cards',
+  },
+  fetchFunctions: {
+    fetchAvailable: fetchAvailableSentenceCards,
+    fetchDue: fetchDueSentenceCards,
+    fetchNew: fetchNewSentenceCards,
+  },
+  CardComponent: SentenceCardFront,
 };

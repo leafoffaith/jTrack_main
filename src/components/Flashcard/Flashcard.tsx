@@ -209,7 +209,7 @@ export function KanjiCard({
     const loadExamples = async () => {
       try {
         // Dynamically import tatoeba.json
-        const tatoebaData = await import('../JMDict/tatoeba.json');
+        const tatoebaData = await import('../../assets/jmdict/tatoeba.json');
         const sentences = (tatoebaData.default || tatoebaData) as Array<[number, string, number, string]>;
 
         // Filter sentences containing this kanji (limit to 2)
@@ -280,6 +280,24 @@ export function KanjiCard({
             </ul>
           </div>
         )}
+      </div>
+    </div>
+  );
+}
+
+export function SentenceCard({
+  sentence,
+  translation
+}: {
+  sentence: string;
+  translation: string;
+}) {
+  return (
+    <div className="space-y-6 w-full max-w-lg mx-auto">
+      <div className="text-3xl font-bold leading-relaxed">{sentence}</div>
+      <div className="border-t-2 border-gray-200 pt-4">
+        <p className="text-sm text-muted-foreground mb-2">Translation</p>
+        <p className="text-xl text-gray-700">{translation}</p>
       </div>
     </div>
   );

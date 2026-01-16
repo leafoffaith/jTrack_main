@@ -23,8 +23,8 @@
 //CODE STARTS HERE
 
 //IMPORTS
-import data from "./tatoeba.json";
-import { FlashcardItem } from "../Flashcard/FlashcardItem";
+import data from "../assets/jmdict/tatoeba.json";
+import { FlashcardItem } from "../components/Flashcard/FlashcardItem";
 import dayjs from "dayjs";
 
 //define interface for dictionary

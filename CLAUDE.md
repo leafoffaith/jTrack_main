@@ -9,10 +9,9 @@ JTrack is a spaced repetition system (SRS) application for learning Japanese (Hi
 ## Current Development Tasks
 
 See [src/todos.md](src/todos.md) for detailed list of current development tasks, including:
-- Consolidating scheduler logic into a generic component
-- Implementing Kanji and Sentence schedulers
-- Moving JMDict assets to proper location
-- Recent completed tasks and their solutions
+- Recent completed tasks: Generic scheduler consolidation, Kanji scheduler, Review heatmap, JMDict reorganization
+- Pending tasks: Sentence scheduler implementation
+- Backlog: Configurable daily limits in profile
 
 ## Development Commands
 
@@ -62,8 +61,14 @@ Database Layer (Supabase PostgreSQL)
 - `src/lib/` - Core utilities
   - `CacheManager.ts` - IndexedDB caching logic
   - `db.ts` - Dexie database setup
+  - `JMDict.ts` - Sentence flashcard creation utilities
 - `src/hooks/` - Custom React hooks
 - `src/utils/` - Helper functions
+- `src/assets/jmdict/` - Japanese dictionary data
+  - `tatoeba.json` - 65,868 example sentences (8MB)
+  - `innocent_corpus/` - 31 term metadata JSON files
+  - `kanjidic_english/` - 4 kanji dictionary files
+  - `Kuroshiro.js` - Japanese text processing library
 
 ### Routing Structure
 

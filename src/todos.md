@@ -146,32 +146,37 @@
 
 ---
 
-### 5. Move JMDict Assets to Proper Location
-**Status**: TODO
-**Priority**: MEDIUM
+### 5. Move JMDict Assets to Proper Location ✅
+**Status**: COMPLETED
+**Completed**: 2026-01-16
 
 **Goal**: Move JMDict dictionary assets from components folder to assets folder (components should only contain React components, not data files).
 
-**Current Location**: `src/components/JMDict/`
-**Target Location**: `src/assets/jmdict/`
+**Completed Steps**:
+- [x] Created `src/assets/jmdict/` directory
+- [x] Moved `src/components/JMDict/innocent_corpus/` (31 term_meta_bank JSON files)
+- [x] Moved `src/components/JMDict/kanjidic_english/` (4 kanji dictionary files)
+- [x] Moved `src/components/JMDict/tatoeba.json` - Sentence examples (8MB)
+- [x] Moved `src/components/JMDict/Kuroshiro.js` - Japanese text processing library
+- [x] Moved `src/components/JMDict/JMDict.ts` to `src/lib/JMDict.ts`
+- [x] Updated import in `src/lib/JMDict.ts` to point to `../assets/jmdict/tatoeba.json`
+- [x] Updated import in `src/components/Flashcard/Flashcard.tsx` to point to `../../assets/jmdict/tatoeba.json`
+- [x] Deleted empty `src/components/JMDict/` directory
+- [x] Verified TypeScript compiles without errors
 
-**Files to Move**:
-- [ ] `src/components/JMDict/innocent_corpus/` (29 term_meta_bank JSON files)
-- [ ] `src/components/JMDict/kanjidic_english/` (2 kanji_bank + 1 tag_bank JSON files)
-- [ ] `src/components/JMDict/tatoeba.json` - Sentence examples
-- [ ] `src/components/JMDict/Kuroshiro.js` - Japanese text processing library
+**New Structure**:
+```
+src/assets/jmdict/
+├── tatoeba.json (8MB sentence data)
+├── Kuroshiro.js (Japanese text library)
+├── innocent_corpus/ (31 term_meta_bank JSON files)
+└── kanjidic_english/ (4 kanji dictionary files)
 
-**Files to Keep in Components** (code, not data):
-- `src/components/JMDict/JMDict.ts` - Keep in components or move to `src/lib/`
+src/lib/
+└── JMDict.ts (sentence flashcard creation logic)
+```
 
-**Files to Update After Move**:
-- [ ] Any imports referencing the old JMDict path
-- [ ] `src/components/JMDict/JMDict.ts` - Update import paths
-
-**Post-Move Cleanup**:
-- [ ] Delete empty `src/components/JMDict/` directory structure
-- [ ] Verify all imports still work
-- [ ] Test sentence deck integration (if using tatoeba.json)
+**Impact**: Components folder now only contains React components. Data files properly organized in assets.
 
 ---
 
