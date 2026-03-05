@@ -123,26 +123,49 @@
 
 ## Pending Tasks
 
-### 4. Create Sentence Learning Deck
-**Status**: TODO (partially implemented - has stub)
-**Depends On**: Task 2 (optional but recommended)
+### 4. Create Sentence Learning Deck ✅
+**Status**: COMPLETED
+**Completed**: 2026-01-16
 
 **Goal**: Implement sentence study mode for contextual learning.
 
-**Current State**:
-- `src/components/SuperMemo/SentenceScheduler.tsx` - Currently shows "Under Construction" message
-- `src/components/Fetching/useSentenceFetch.ts` - Basic fetch logic exists
-- Routing already exists in `src/main.tsx:52-55`
+**Completed Steps**:
+- [x] Refactored `src/components/Fetching/useSentenceFetch.ts` to match GenericScheduler pattern
+  - [x] Created `fetchAvailableSentenceCards()`, `fetchDueSentenceCards()`, `fetchNewSentenceCards()` wrapper functions
+  - [x] Loads sentences from `tatoeba.json` (first 1000 sentences)
+  - [x] Uses shared utilities from `sharedCardFetch.ts`
+  - [x] Implements 3 new cards per day limit with sessionHelper
+- [x] Created `SENTENCE_CONFIG` in `src/components/SuperMemo/configs/deckConfigs.ts`
+  - [x] Added SentenceCardFront component (shows Japanese sentence on front, sentence + translation on back)
+  - [x] Configured fetch functions and deck settings
+- [x] Updated `src/components/SuperMemo/SentenceScheduler.tsx`
+  - [x] Replaced "Under Construction" stub with GenericScheduler
+  - [x] Now uses SENTENCE_CONFIG (same pattern as other decks)
+- [x] Added `SentenceCard` component in `src/components/Flashcard/Flashcard.tsx`
+  - [x] Displays Japanese sentence and English translation
+- [x] Fixed all TypeScript errors
 
-**Files to Update**:
-- [ ] `src/components/SuperMemo/SentenceScheduler.tsx` - Implement full scheduler (use GenericScheduler if available)
-- [ ] `src/components/Flashcard/Flashcard.tsx` - Add SentenceCard component if not exists
-- [ ] `src/components/Fetching/useSentenceFetch.ts` - Verify and adapt to match shared pattern
+**Architecture Decision**:
+- **Data Source**: Uses `tatoeba.json` directly (client-side), not a Supabase table
+- **Why**: 65,868 sentences would require large database imports; client-side loading is simpler and faster
+- **Subset**: Uses first 1000 sentences to keep it manageable
+- **Trade-off**: No server-side filtering, but avoids database overhead
 
-**Database Considerations**:
-- May need to create/verify `sentence` table in Supabase
-- Consider using JMDict tatoeba.json data (see task 5)
-- Sentence cards might have multiple-choice options
+**Features Implemented**:
+- Front side: Japanese sentence only
+- Back side: Japanese sentence + English translation
+- 3 new cards per day limit
+- Unlimited due cards
+- Full SRS algorithm integration (SuperMemo 2)
+- Cache integration via CacheManager
+- Deck type: 'sentence' (tracked separately in studied_flashcards)
+
+**Testing Needed**:
+- [ ] Test sentence study session
+- [ ] Verify cache updates correctly
+- [ ] Verify daily limit enforcement
+- [ ] Test due card prioritization
+- [ ] Test that cards flip and rate correctly
 
 ---
 

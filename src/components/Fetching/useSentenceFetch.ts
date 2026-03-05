@@ -31,9 +31,6 @@ const loadSentencesFromTatoeba = (): FlashcardItem[] => {
  * Matches GenericScheduler pattern
  */
 export const fetchAvailableSentenceCards = async (userId: string): Promise<CardFetchResult> => {
-  // Load sentences from tatoeba.json
-  const allSentences = loadSentencesFromTatoeba();
-
   // Get due cards from database
   const { cards: dueCards } = await fetchDueCards(userId, 'sentence');
 
@@ -73,7 +70,7 @@ export const fetchNewSentenceCards = async (userId: string): Promise<CardFetchRe
   );
 
   // Check daily limit
-  const shownToday = getNewCardsShownToday('sentence');
+  const shownToday = getNewCardsShownToday('sentence').length;
   const remaining = Math.max(0, DAILY_NEW_CARD_LIMIT - shownToday);
 
   if (remaining === 0) {
@@ -84,8 +81,8 @@ export const fetchNewSentenceCards = async (userId: string): Promise<CardFetchRe
   const cardsToShow = unstudiedSentences.slice(0, remaining);
 
   // Mark cards as shown today
-  cardsToShow.forEach(() => {
-    markNewCardShown('sentence');
+  cardsToShow.forEach((card) => {
+    markNewCardShown('sentence', card.front);
   });
 
   return { cards: cardsToShow };
